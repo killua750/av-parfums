@@ -1,0 +1,524 @@
+[
+  {
+    "model": "core.wilaya",
+    "pk": 1,
+    "fields": {
+      "code": 1,
+      "name": "Adrar",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 2,
+    "fields": {
+      "code": 2,
+      "name": "Chlef",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 3,
+    "fields": {
+      "code": 3,
+      "name": "Laghouat",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 4,
+    "fields": {
+      "code": 4,
+      "name": "Oum El Bouaghi",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 5,
+    "fields": {
+      "code": 5,
+      "name": "Batna",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 6,
+    "fields": {
+      "code": 6,
+      "name": "Béjaïa",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 7,
+    "fields": {
+      "code": 7,
+      "name": "Biskra",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 8,
+    "fields": {
+      "code": 8,
+      "name": "Béchar",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 9,
+    "fields": {
+      "code": 9,
+      "name": "Blida",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 10,
+    "fields": {
+      "code": 10,
+      "name": "Bouira",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 11,
+    "fields": {
+      "code": 11,
+      "name": "Tamanrasset",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 12,
+    "fields": {
+      "code": 12,
+      "name": "Tébessa",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 13,
+    "fields": {
+      "code": 13,
+      "name": "Tlemcen",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 14,
+    "fields": {
+      "code": 14,
+      "name": "Tiaret",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 15,
+    "fields": {
+      "code": 15,
+      "name": "Tizi Ouzou",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 16,
+    "fields": {
+      "code": 16,
+      "name": "Alger",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 17,
+    "fields": {
+      "code": 17,
+      "name": "Djelfa",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 18,
+    "fields": {
+      "code": 18,
+      "name": "Jijel",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 19,
+    "fields": {
+      "code": 19,
+      "name": "Sétif",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 20,
+    "fields": {
+      "code": 20,
+      "name": "Saïda",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 21,
+    "fields": {
+      "code": 21,
+      "name": "Skikda",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 22,
+    "fields": {
+      "code": 22,
+      "name": "Sidi Bel Abbès",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 23,
+    "fields": {
+      "code": 23,
+      "name": "Annaba",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 24,
+    "fields": {
+      "code": 24,
+      "name": "Guelma",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 25,
+    "fields": {
+      "code": 25,
+      "name": "Constantine",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 26,
+    "fields": {
+      "code": 26,
+      "name": "Médéa",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 27,
+    "fields": {
+      "code": 27,
+      "name": "Mostaganem",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 28,
+    "fields": {
+      "code": 28,
+      "name": "M'Sila",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 29,
+    "fields": {
+      "code": 29,
+      "name": "Mascara",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 30,
+    "fields": {
+      "code": 30,
+      "name": "Ouargla",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 31,
+    "fields": {
+      "code": 31,
+      "name": "Oran",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 32,
+    "fields": {
+      "code": 32,
+      "name": "El Bayadh",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 33,
+    "fields": {
+      "code": 33,
+      "name": "Illizi",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 34,
+    "fields": {
+      "code": 34,
+      "name": "Bordj Bou Arréridj",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 35,
+    "fields": {
+      "code": 35,
+      "name": "Boumerdès",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 36,
+    "fields": {
+      "code": 36,
+      "name": "El Tarf",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 37,
+    "fields": {
+      "code": 37,
+      "name": "Tindouf",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 38,
+    "fields": {
+      "code": 38,
+      "name": "Tissemsilt",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 39,
+    "fields": {
+      "code": 39,
+      "name": "El Oued",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 40,
+    "fields": {
+      "code": 40,
+      "name": "Khenchela",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 41,
+    "fields": {
+      "code": 41,
+      "name": "Souk Ahras",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 42,
+    "fields": {
+      "code": 42,
+      "name": "Tipaza",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 43,
+    "fields": {
+      "code": 43,
+      "name": "Mila",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 44,
+    "fields": {
+      "code": 44,
+      "name": "Aïn Defla",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 45,
+    "fields": {
+      "code": 45,
+      "name": "Naâma",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 46,
+    "fields": {
+      "code": 46,
+      "name": "Aïn Témouchent",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 47,
+    "fields": {
+      "code": 47,
+      "name": "Ghardaïa",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 48,
+    "fields": {
+      "code": 48,
+      "name": "Relizane",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 49,
+    "fields": {
+      "code": 49,
+      "name": "Timimoun",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 50,
+    "fields": {
+      "code": 50,
+      "name": "Bordj Badji Mokhtar",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 51,
+    "fields": {
+      "code": 51,
+      "name": "Ouled Djellal",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 52,
+    "fields": {
+      "code": 52,
+      "name": "Béni Abbès",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 53,
+    "fields": {
+      "code": 53,
+      "name": "In Salah",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 54,
+    "fields": {
+      "code": 54,
+      "name": "In Guezzam",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 55,
+    "fields": {
+      "code": 55,
+      "name": "Touggourt",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 56,
+    "fields": {
+      "code": 56,
+      "name": "Djanet",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 57,
+    "fields": {
+      "code": 57,
+      "name": "El M'Ghair",
+      "name_ar": ""
+    }
+  },
+  {
+    "model": "core.wilaya",
+    "pk": 58,
+    "fields": {
+      "code": 58,
+      "name": "El Meniaa",
+      "name_ar": ""
+    }
+  }
+]

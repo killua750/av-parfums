@@ -1,0 +1,132 @@
+{
+  "nav": {
+    "shop": "Boutique",
+    "new": "Nouveautés",
+    "about": "À propos",
+    "contact": "Contact",
+    "account": "Mon compte",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "admin": "Admin",
+    "openCart": "Ouvrir le panier"
+  },
+  "hero": {
+    "buy": "Acheter",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "goTo": "Aller au produit {{index}}"
+  },
+  "cart": {
+    "title": "Mon panier",
+    "empty": "Votre panier est vide.",
+    "subtotal": "Sous-total",
+    "checkout": "Passer la commande",
+    "remove": "Retirer",
+    "close": "Fermer",
+    "decrease": "Diminuer",
+    "increase": "Augmenter",
+    "added": "Ajouté au panier"
+  },
+  "checkout": {
+    "title": "Paiement à la livraison",
+    "fullName": "Nom et prénom",
+    "phone": "Numéro de téléphone",
+    "wilaya": "Wilaya",
+    "commune": "Commune",
+    "address": "Adresse de livraison",
+    "submit": "Confirmer ma commande",
+    "submitting": "Envoi...",
+    "success": "Merci !",
+    "successBody": "Notre équipe va vous contacter par téléphone pour confirmer votre commande.",
+    "orderNumber": "Numéro de commande",
+    "emptyCart": "Votre panier est vide — ajoutez un produit avant de commander.",
+    "errors": {
+      "name": "Nom trop court.",
+      "phone": "Numéro de téléphone algérien invalide (ex: 0550123456).",
+      "wilaya": "Choisissez une wilaya.",
+      "commune": "Commune requise.",
+      "address": "Adresse trop courte."
+    }
+  },
+  "shop": {
+    "title": "Boutique",
+    "all": "Toutes les catégories",
+    "sort": "Trier",
+    "newest": "Nouveautés",
+    "priceAsc": "Prix croissant",
+    "priceDesc": "Prix décroissant",
+    "search": "Rechercher...",
+    "minPrice": "Prix min",
+    "maxPrice": "Prix max",
+    "empty": "Aucun produit trouvé.",
+    "outOfStock": "Rupture de stock",
+    "page": "Page {{page}}"
+  },
+  "product": {
+    "addToCart": "Ajouter au panier",
+    "notFound": "Produit introuvable."
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "Créer un compte",
+    "email": "Email",
+    "password": "Mot de passe",
+    "passwordConfirm": "Confirmer le mot de passe",
+    "firstName": "Prénom",
+    "phone": "Téléphone (optionnel)",
+    "noAccount": "Pas de compte ?",
+    "haveAccount": "Déjà un compte ?",
+    "loginFailed": "Email ou mot de passe incorrect.",
+    "welcome": "Bienvenue !"
+  },
+  "account": {
+    "title": "Mon compte",
+    "orders": "Mes commandes",
+    "noOrders": "Aucune commande pour le moment.",
+    "profile": "Profil"
+  },
+  "order": {
+    "title": "Commande {{number}}",
+    "status": {
+      "pending": "En attente",
+      "confirmed": "Confirmée",
+      "shipped": "Expédiée",
+      "delivered": "Livrée",
+      "cancelled": "Annulée"
+    },
+    "total": "Total",
+    "shippingTo": "Livraison à"
+  },
+  "admin": {
+    "title": "Tableau de bord",
+    "products": "Produits",
+    "orders": "Commandes",
+    "newProduct": "Nouveau produit",
+    "name": "Nom",
+    "price": "Prix",
+    "stock": "Stock",
+    "status": "Statut",
+    "actions": "Actions",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "confirm": "Confirmer",
+    "ship": "Expédier",
+    "deliver": "Livrer",
+    "cancel": "Annuler",
+    "customer": "Client",
+    "date": "Date",
+    "category": "Catégorie",
+    "tint": "Couleur (tint)",
+    "bottleImage": "Image bouteille",
+    "backgroundImage": "Image de fond",
+    "saved": "Enregistré.",
+    "denied": "Accès réservé aux administrateurs."
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue.",
+    "retry": "Réessayer",
+    "back": "Retour"
+  }
+}

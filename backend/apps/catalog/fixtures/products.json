@@ -1,0 +1,74 @@
+[
+  {
+    "model": "catalog.category",
+    "pk": 1,
+    "fields": {
+      "name": "Brumes parfumées",
+      "slug": "brumes-parfumees",
+      "created_at": "2026-07-07T12:00:00Z",
+      "updated_at": "2026-07-07T12:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 1,
+    "fields": {
+      "category": 1,
+      "name": "Sweet Dreams",
+      "slug": "sweet-dreams",
+      "tagline": "Floral · Fruits rouges · Musc",
+      "description": "Brume parfumée florale — pétales de rose, fruits rouges et une touche de musc pour une signature enveloppante.",
+      "tint": "#E88BB0",
+      "bottle_image": "products/bottles/sweet-dreams-bottle.png",
+      "background_image": "products/backgrounds/sweet-dreams-bg.jpg",
+      "is_active": true,
+      "featured": true,
+      "created_at": "2026-07-07T12:00:00Z",
+      "updated_at": "2026-07-07T12:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productvariant",
+    "pk": 1,
+    "fields": {
+      "product": 1,
+      "sku": "AV-SD-200",
+      "size": "Brume 200ml",
+      "price": "2500.00",
+      "stock": 50,
+      "created_at": "2026-07-07T12:00:00Z",
+      "updated_at": "2026-07-07T12:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 2,
+    "fields": {
+      "category": 1,
+      "name": "Honey Touch",
+      "slug": "honey-touch",
+      "tagline": "Vanille · Miel · Chaleur",
+      "description": "Un sillage chaud et gourmand — miel doré, vanille bourbon et bois précieux pour une aura solaire.",
+      "tint": "#D9A25A",
+      "bottle_image": "products/bottles/honey-touch-bottle.png",
+      "background_image": "products/backgrounds/honey-touch-bg.jpg",
+      "is_active": true,
+      "featured": true,
+      "created_at": "2026-07-07T12:00:00Z",
+      "updated_at": "2026-07-07T12:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productvariant",
+    "pk": 2,
+    "fields": {
+      "product": 2,
+      "sku": "AV-HT-200",
+      "size": "Brume 200ml",
+      "price": "2800.00",
+      "stock": 50,
+      "created_at": "2026-07-07T12:00:00Z",
+      "updated_at": "2026-07-07T12:00:00Z"
+    }
+  }
+]

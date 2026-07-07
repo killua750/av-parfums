@@ -1,0 +1,132 @@
+{
+  "nav": {
+    "shop": "Shop",
+    "new": "New",
+    "about": "About",
+    "contact": "Contact",
+    "account": "My account",
+    "login": "Log in",
+    "logout": "Log out",
+    "admin": "Admin",
+    "openCart": "Open cart"
+  },
+  "hero": {
+    "buy": "Buy now",
+    "prev": "Previous",
+    "next": "Next",
+    "goTo": "Go to product {{index}}"
+  },
+  "cart": {
+    "title": "My cart",
+    "empty": "Your cart is empty.",
+    "subtotal": "Subtotal",
+    "checkout": "Checkout",
+    "remove": "Remove",
+    "close": "Close",
+    "decrease": "Decrease",
+    "increase": "Increase",
+    "added": "Added to cart"
+  },
+  "checkout": {
+    "title": "Cash on delivery",
+    "fullName": "Full name",
+    "phone": "Phone number",
+    "wilaya": "Wilaya",
+    "commune": "Commune",
+    "address": "Delivery address",
+    "submit": "Confirm my order",
+    "submitting": "Sending...",
+    "success": "Thank you!",
+    "successBody": "Our team will call you to confirm your order.",
+    "orderNumber": "Order number",
+    "emptyCart": "Your cart is empty — add a product before ordering.",
+    "errors": {
+      "name": "Name is too short.",
+      "phone": "Invalid Algerian phone number (e.g. 0550123456).",
+      "wilaya": "Pick a wilaya.",
+      "commune": "Commune is required.",
+      "address": "Address is too short."
+    }
+  },
+  "shop": {
+    "title": "Shop",
+    "all": "All categories",
+    "sort": "Sort",
+    "newest": "Newest",
+    "priceAsc": "Price: low to high",
+    "priceDesc": "Price: high to low",
+    "search": "Search...",
+    "minPrice": "Min price",
+    "maxPrice": "Max price",
+    "empty": "No products found.",
+    "outOfStock": "Out of stock",
+    "page": "Page {{page}}"
+  },
+  "product": {
+    "addToCart": "Add to cart",
+    "notFound": "Product not found."
+  },
+  "auth": {
+    "login": "Log in",
+    "register": "Create an account",
+    "email": "Email",
+    "password": "Password",
+    "passwordConfirm": "Confirm password",
+    "firstName": "First name",
+    "phone": "Phone (optional)",
+    "noAccount": "No account?",
+    "haveAccount": "Already have an account?",
+    "loginFailed": "Incorrect email or password.",
+    "welcome": "Welcome!"
+  },
+  "account": {
+    "title": "My account",
+    "orders": "My orders",
+    "noOrders": "No orders yet.",
+    "profile": "Profile"
+  },
+  "order": {
+    "title": "Order {{number}}",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "total": "Total",
+    "shippingTo": "Shipping to"
+  },
+  "admin": {
+    "title": "Dashboard",
+    "products": "Products",
+    "orders": "Orders",
+    "newProduct": "New product",
+    "name": "Name",
+    "price": "Price",
+    "stock": "Stock",
+    "status": "Status",
+    "actions": "Actions",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "ship": "Ship",
+    "deliver": "Deliver",
+    "cancel": "Cancel",
+    "customer": "Customer",
+    "date": "Date",
+    "category": "Category",
+    "tint": "Tint color",
+    "bottleImage": "Bottle image",
+    "backgroundImage": "Background image",
+    "saved": "Saved.",
+    "denied": "Admins only."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong.",
+    "retry": "Retry",
+    "back": "Back"
+  }
+}

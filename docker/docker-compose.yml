@@ -1,0 +1,106 @@
+# Local development stack. Run from the repo root:
+#   docker compose -f docker/docker-compose.yml --env-file .env up -d --build
+# Then: frontend http://localhost:8080, API http://localhost:8080/api/v1/,
+# Django admin http://localhost:8080/django-admin/
+
+name: av-parfums
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-av_parfums}
+      POSTGRES_USER: ${POSTGRES_USER:-av_parfums}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-av_parfums}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-av_parfums}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ../backend
+    environment: &backend-env
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      SECRET_KEY: ${SECRET_KEY:-insecure-dev-only-key}
+      DEBUG: "True"
+      ALLOWED_HOSTS: localhost,127.0.0.1,backend
+      DATABASE_URL: postgres://${POSTGRES_USER:-av_parfums}:${POSTGRES_PASSWORD:-av_parfums}@postgres:5432/${POSTGRES_DB:-av_parfums}
+      REDIS_URL: redis://redis:6379/0
+      CELERY_TASK_ALWAYS_EAGER: "False"
+      CORS_ALLOWED_ORIGINS: http://localhost:5173,http://localhost:8080
+      CSRF_TRUSTED_ORIGINS: http://localhost:5173,http://localhost:8080
+      ORDER_NOTIFICATION_EMAIL: ${ORDER_NOTIFICATION_EMAIL:-}
+    command: >
+      sh -c "python manage.py migrate --no-input &&
+             python manage.py loaddata wilayas products &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 2 --reload"
+    volumes:
+      - media:/app/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  celery:
+    build: ../backend
+    environment: *backend-env
+    command: celery -A config worker --loglevel=info
+    volumes:
+      - media:/app/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery-beat:
+    build: ../backend
+    environment: *backend-env
+    command: celery -A config beat --loglevel=info
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    environment:
+      VITE_API_URL: ""
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    volumes:
+      - ../frontend:/app
+      - frontend_node_modules:/app/node_modules
+    ports:
+      - "5173:5173"
+
+  nginx:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - media:/srv/media:ro
+    depends_on:
+      - backend
+      - frontend
+    ports:
+      - "8080:80"
+
+volumes:
+  pgdata:
+  media:
+  frontend_node_modules:
