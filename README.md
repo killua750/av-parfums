@@ -101,9 +101,11 @@ on `main`. Wire your deploy target (Fly.io / Railway / VPS / ECS) in the
 
 ## Product images
 
-The original renders live on Lovable's CDN and were not in the export. SVG
-placeholders keep the UI intact — see `frontend/public/images/README.md` for
-the two ways to restore the real PNG/JPG assets.
+The original renders were recovered from Lovable's CDN and live in
+`backend/seed_media/products/` (tracked in git). `python manage.py seed_media`
+copies them into `MEDIA_ROOT` without overwriting admin uploads — compose and
+`make seed` run it automatically. SVG fallbacks in `frontend/public/images/`
+only appear if the API is unreachable.
 
 ## Handy Make targets
 

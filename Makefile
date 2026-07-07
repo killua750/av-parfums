@@ -36,7 +36,7 @@ migrate:
 	cd backend && python manage.py migrate
 
 seed:
-	cd backend && python manage.py loaddata wilayas products
+	cd backend && python manage.py loaddata wilayas products && python manage.py seed_media
 
 superuser:
 	cd backend && python manage.py createsuperuser

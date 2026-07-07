@@ -41,6 +41,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     price = serializers.SerializerMethodField()
     in_stock = serializers.SerializerMethodField()
+    volume = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -49,6 +50,8 @@ class ProductListSerializer(serializers.ModelSerializer):
             "name",
             "slug",
             "tagline",
+            "description",
+            "volume",
             "tint",
             "category",
             "bottle_image",
@@ -65,13 +68,18 @@ class ProductListSerializer(serializers.ModelSerializer):
     def get_in_stock(self, obj: Product) -> bool:
         return any(v.stock > 0 for v in obj.variants.all())
 
+    def get_volume(self, obj: Product) -> str | None:
+        # Hero pill label, e.g. "Brume 200ml" (the default variant's size).
+        variant = obj.default_variant
+        return variant.size if variant else None
+
 
 class ProductDetailSerializer(ProductListSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
     variants = ProductVariantSerializer(many=True, read_only=True)
 
     class Meta(ProductListSerializer.Meta):
-        fields = ProductListSerializer.Meta.fields + ["description", "images", "variants"]
+        fields = ProductListSerializer.Meta.fields + ["images", "variants"]
 
 
 class ProductWriteSerializer(serializers.ModelSerializer):

@@ -32,6 +32,8 @@ export interface Product {
   name: string;
   slug: string;
   tagline: string;
+  description: string;
+  volume: string | null;
   tint: string;
   category: Category;
   bottle_image: string | null;
@@ -42,7 +44,6 @@ export interface Product {
 }
 
 export interface ProductDetail extends Product {
-  description: string;
   images: ProductImage[];
   variants: ProductVariant[];
 }

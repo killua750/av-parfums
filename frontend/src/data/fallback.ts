@@ -9,6 +9,9 @@ export const FALLBACK_PRODUCTS: Product[] = [
     name: "Sweet Dreams",
     slug: "sweet-dreams",
     tagline: "Floral · Fruits rouges · Musc",
+    description:
+      "Brume parfumée florale — pétales de rose, fruits rouges et une touche de musc pour une signature enveloppante.",
+    volume: "Brume 200ml",
     tint: "#E88BB0",
     category: { id: 1, name: "Brumes parfumées", slug: "brumes-parfumees" },
     bottle_image: "/images/sweet-dreams-bottle.svg",
@@ -22,6 +25,9 @@ export const FALLBACK_PRODUCTS: Product[] = [
     name: "Honey Touch",
     slug: "honey-touch",
     tagline: "Vanille · Miel · Chaleur",
+    description:
+      "Un sillage chaud et gourmand — miel doré, vanille bourbon et bois précieux pour une aura solaire.",
+    volume: "Brume 200ml",
     tint: "#D9A25A",
     category: { id: 1, name: "Brumes parfumées", slug: "brumes-parfumees" },
     bottle_image: "/images/honey-touch-bottle.svg",
@@ -31,10 +37,3 @@ export const FALLBACK_PRODUCTS: Product[] = [
     featured: true,
   },
 ];
-
-export const FALLBACK_DESCRIPTIONS: Record<string, string> = {
-  "sweet-dreams":
-    "Brume parfumée florale — pétales de rose, fruits rouges et une touche de musc pour une signature enveloppante.",
-  "honey-touch":
-    "Un sillage chaud et gourmand — miel doré, vanille bourbon et bois précieux pour une aura solaire.",
-};

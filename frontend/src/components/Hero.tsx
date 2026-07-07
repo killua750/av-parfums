@@ -242,7 +242,7 @@ export default function Hero() {
               color: "#fff",
             }}
           >
-            {active.tagline}
+            {active.volume ?? active.tagline}
           </div>
           <h2
             className="mb-2 text-xl sm:text-[26px] font-bold uppercase tracking-wider"
@@ -250,6 +250,12 @@ export default function Hero() {
           >
             {active.name}
           </h2>
+          <p
+            className="text-xs sm:text-sm mb-3 mx-auto sm:mx-0 max-w-xs sm:max-w-none"
+            style={{ color: "#fff", opacity: 0.9, lineHeight: 1.6 }}
+          >
+            {active.description}
+          </p>
           <div
             className="mb-4 text-2xl sm:text-3xl font-bold"
             style={{ color: "#fff", fontFamily: "Anton, sans-serif", letterSpacing: "0.02em" }}
