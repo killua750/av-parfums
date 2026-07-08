@@ -26,19 +26,31 @@ export function useProducts(filters: ShopFilters = {}) {
   });
 }
 
-/** Hero carousel: featured products, falling back to the local seed data so
- * the landing page always renders (API down, first deploy, ...). */
+// The two signature products ship as static assets on the CDN. Their images
+// stay pinned to those files even when the API answers — no re-download or
+// flicker, and the hero is immune to the free-tier API's cold starts.
+const STATIC_IMAGES = new Map(
+  FALLBACK_PRODUCTS.map((p) => [p.slug, [p.bottle_image, p.background_image] as const]),
+);
+
+/** Hero carousel + home grid: renders instantly from the static fallback
+ * (placeholderData), then silently refreshes from the API. */
 export function useFeaturedProducts() {
   return useQuery<Product[]>({
     queryKey: ["products", "featured"],
     queryFn: async () => {
       try {
         const page = await api<Paginated<Product>>("/api/v1/products/?featured=true");
-        return page.results.length ? page.results : FALLBACK_PRODUCTS;
+        if (!page.results.length) return FALLBACK_PRODUCTS;
+        return page.results.map((p) => {
+          const pinned = STATIC_IMAGES.get(p.slug);
+          return pinned ? { ...p, bottle_image: pinned[0], background_image: pinned[1] } : p;
+        });
       } catch {
         return FALLBACK_PRODUCTS;
       }
     },
+    placeholderData: FALLBACK_PRODUCTS,
     staleTime: 60 * 1000,
   });
 }

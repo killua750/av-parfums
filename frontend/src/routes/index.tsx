@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import Hero from "@/components/Hero";
 import { ProductCard, ProductCardSkeleton } from "@/components/ProductCard";
-import { useFeaturedProducts, useProducts } from "@/hooks/useProducts";
+import { useFeaturedProducts } from "@/hooks/useProducts";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -20,9 +20,10 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const { t } = useTranslation();
-  const { data, isPending } = useProducts({ ordering: "-created_at" });
-  const { data: featured = [] } = useFeaturedProducts();
-  const products = (data?.results ?? []).slice(0, 4);
+  // Featured products render instantly from the static CDN assets — no
+  // waiting on the (cold-startable) API for the first paint.
+  const { data: featured = [], isPending } = useFeaturedProducts();
+  const products = featured.slice(0, 4);
 
   const values = [
     { icon: Banknote, title: t("home.codTitle"), text: t("home.codText") },

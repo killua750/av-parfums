@@ -9,6 +9,6 @@
       "source": "/media/:path*",
       "destination": "https://av-parfums-api.onrender.com/media/:path*"
     },
-    { "source": "/((?!assets/).*)", "destination": "/index.html" }
+    { "source": "/((?!api/|media/|assets/).*)", "destination": "/index.html" }
   ]
 }
