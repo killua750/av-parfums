@@ -67,8 +67,7 @@ function AdminProducts() {
     if (!q) return list;
     return list.filter(
       (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.variants.some((v) => v.sku.toLowerCase().includes(q)),
+        p.name.toLowerCase().includes(q) || p.variants.some((v) => v.sku.toLowerCase().includes(q)),
     );
   }, [data, query]);
 

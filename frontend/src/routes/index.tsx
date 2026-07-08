@@ -41,7 +41,10 @@ function HomePage() {
             <p className="mb-2 text-[11px] uppercase tracking-[0.25em] text-white/40">
               {t("home.collectionEyebrow")}
             </p>
-            <h2 className="text-3xl sm:text-4xl uppercase" style={{ fontFamily: "Anton, sans-serif" }}>
+            <h2
+              className="text-3xl sm:text-4xl uppercase"
+              style={{ fontFamily: "Anton, sans-serif" }}
+            >
               {t("home.collectionTitle")}
             </h2>
           </div>
@@ -112,7 +115,8 @@ function HomePage() {
               style={{
                 backgroundColor: p.tint + "38",
                 border: `1px solid ${p.tint}55`,
-                transform: i === 0 ? "rotate(-6deg) translateX(-38%)" : "rotate(6deg) translateX(38%)",
+                transform:
+                  i === 0 ? "rotate(-6deg) translateX(-38%)" : "rotate(6deg) translateX(38%)",
                 zIndex: i === 0 ? 1 : 2,
               }}
             >

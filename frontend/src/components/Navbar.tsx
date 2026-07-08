@@ -29,11 +29,7 @@ export default function Navbar() {
       <Link to="/shop" className="hover:text-white transition">
         {t("nav.shop")}
       </Link>
-      <Link
-        to="/shop"
-        search={{ ordering: "-created_at" }}
-        className="hover:text-white transition"
-      >
+      <Link to="/shop" search={{ ordering: "-created_at" }} className="hover:text-white transition">
         {t("nav.new")}
       </Link>
       <Link to="/about" className="hover:text-white transition">
