@@ -237,6 +237,8 @@ if env("USE_S3"):
     AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY", default="")
     AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME", default="")
     AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME", default="")
+    # S3-compatible providers (Cloudflare R2, Backblaze B2, MinIO…).
+    AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL", default=None)
     AWS_QUERYSTRING_AUTH = False
 
 # --- Celery -------------------------------------------------------------------

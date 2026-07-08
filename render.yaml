@@ -1,0 +1,40 @@
+# Render Blueprint — deploys the Django API on the free plan.
+# Dashboard → New → Blueprint → point it at this repo.
+# The free instance spins down after ~15 min idle; first request then takes
+# ~30-60 s to wake. Fine for a demo/client validation, upgrade for launch.
+
+services:
+  - type: web
+    name: av-parfums-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input
+    # seed_media is idempotent (never overwrites) — it restores the bundled
+    # product images because the free disk is ephemeral. Fixtures/superuser
+    # are seeded ONCE from your machine (see DEPLOYMENT.md), never at boot,
+    # so admin edits to products/stock survive restarts.
+    startCommand: >
+      python manage.py migrate --no-input &&
+      python manage.py seed_media &&
+      gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2
+    healthCheckPath: /api/v1/health/
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: DATABASE_URL
+        sync: false # paste your Neon connection string in the dashboard
+      - key: ALLOWED_HOSTS
+        value: av-parfums-api.onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false # https://<your-app>.vercel.app
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false # same as above (harmless even though the proxy makes it same-origin)
+      - key: CELERY_TASK_ALWAYS_EAGER
+        value: "True" # no Redis on the free tier: tasks run inline
+      - key: ORDER_NOTIFICATION_EMAIL
+        sync: false
