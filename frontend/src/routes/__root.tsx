@@ -3,6 +3,7 @@ import { createRootRouteWithContext, HeadContent, Link, Outlet } from "@tanstack
 import { Toaster } from "sonner";
 
 import CartDrawer from "@/components/CartDrawer";
+import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { organizationJsonLd } from "@/lib/seo";
 
@@ -36,6 +37,7 @@ function RootComponent() {
       <HeadContent />
       <Navbar />
       <Outlet />
+      <Footer />
       <CartDrawer />
       <Toaster richColors position="top-center" />
     </>

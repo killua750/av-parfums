@@ -157,5 +157,56 @@
     "error": "Une erreur est survenue.",
     "retry": "Réessayer",
     "back": "Retour"
+  },
+  "home": {
+    "collectionEyebrow": "La collection",
+    "collectionTitle": "Nos brumes signature",
+    "seeAll": "Tout voir",
+    "codTitle": "Paiement à la livraison",
+    "codText": "Commandez en ligne, payez en espèces à la réception. Zéro risque.",
+    "shipTitle": "Livraison 58 wilayas",
+    "shipText": "Partout en Algérie, à domicile ou en point relais.",
+    "qualityTitle": "Qualité premium",
+    "qualityText": "Des brumes concentrées, élaborées avec des essences soigneusement sélectionnées.",
+    "storyEyebrow": "Notre histoire",
+    "storyTitle": "Une signature olfactive pensée pour durer",
+    "storyText": "AV Parfums est né d'une conviction simple : chacune mérite un sillage qui lui ressemble. Nos brumes parfumées capturent des instants — la douceur d'un rêve sucré, la chaleur dorée du miel — dans des formules généreuses de 200 ml.",
+    "storyCta": "Découvrir la marque",
+    "ctaTitle": "Prête à trouver votre signature ?",
+    "ctaButton": "Explorer la boutique"
+  },
+  "footer": {
+    "tagline": "Brumes parfumées de luxe, pensées en Algérie pour sublimer chaque instant.",
+    "shop": "Boutique",
+    "help": "Informations",
+    "account": "Compte",
+    "shippingTitle": "Livraison dans les 58 wilayas",
+    "shippingText": "Expédition rapide partout en Algérie.",
+    "codTitle": "Paiement à la livraison",
+    "codText": "Réglez en espèces à la réception de votre commande.",
+    "rights": "Tous droits réservés.",
+    "madeIn": "Conçu avec soin en Algérie 🇩🇿"
+  },
+  "about": {
+    "eyebrow": "À propos",
+    "title": "L'art de la brume parfumée",
+    "p1": "AV Parfums crée des brumes parfumées qui allient intensité et légèreté. Chaque fragrance est pensée comme une signature : identifiable, enveloppante, fidèle du matin au soir.",
+    "p2": "De Sweet Dreams à Honey Touch, nos créations sont élaborées avec des essences sélectionnées et conditionnées en flacons généreux de 200 ml — pour que le geste parfum devienne un rituel quotidien, pas un luxe occasionnel.",
+    "howTitle": "Comment ça marche",
+    "step1Title": "Commandez en ligne",
+    "step1Text": "Choisissez vos brumes et validez votre panier en quelques secondes, sans compte obligatoire.",
+    "step2Title": "Confirmation rapide",
+    "step2Text": "Notre équipe vous appelle pour confirmer la commande et l'adresse de livraison.",
+    "step3Title": "Payez à la réception",
+    "step3Text": "Recevez votre colis partout en Algérie et réglez en espèces à la livraison."
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "Parlons-en",
+    "intro": "Une question sur une commande, un produit ou une collaboration ? Notre équipe vous répond rapidement sur le canal de votre choix.",
+    "emailTitle": "E-mail",
+    "phoneTitle": "Téléphone",
+    "hoursTitle": "Disponibilité",
+    "hoursText": "Samedi – jeudi, 9h à 18h. Les commandes en ligne restent ouvertes 24h/24."
   }
 }

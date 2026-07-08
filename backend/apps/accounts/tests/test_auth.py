@@ -77,3 +77,14 @@ class TestMe:
         assert resp.status_code == 200
         user.refresh_from_db()
         assert user.role == User.Role.CUSTOMER  # no client-side escalation
+
+
+class TestLogout:
+    def test_logout_clears_jwt_cookies(self, api_client, user):
+        api_client.post(LOGIN_URL, {"email": user.email, "password": "S3curePass!42"})
+        resp = api_client.post(reverse("auth-logout"))
+        assert resp.status_code == 200, resp.data
+        # Cookies must be expired (empty value) so the session actually ends.
+        assert resp.cookies["av-access"].value == ""
+        assert resp.cookies["av-refresh"].value == ""
+        assert api_client.get(ME_URL).status_code in (401, 403)

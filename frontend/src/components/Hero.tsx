@@ -34,6 +34,8 @@ export default function Hero() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const wheelLock = useRef(false);
   const touchStartX = useRef<number | null>(null);
+  const activeIndexRef = useRef(0);
+  activeIndexRef.current = activeIndex;
 
   useEffect(() => {
     products.forEach((p) => {
@@ -64,11 +66,16 @@ export default function Hero() {
     const el = containerRef.current;
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
+      // Once the page is scrolled past the hero, the wheel belongs to the page.
+      if (window.scrollY > 8) return;
       if (Math.abs(e.deltaY) < 20 && Math.abs(e.deltaX) < 20) return;
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      // Scrolling down on the last product releases into the page content
+      // below; scrolling up on the first does nothing anyway (already at top).
+      if (delta > 0 && activeIndexRef.current === products.length - 1) return;
       e.preventDefault();
       if (wheelLock.current) return;
       wheelLock.current = true;
-      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
       navigate(delta > 0 ? "next" : "prev");
       window.setTimeout(() => {
         wheelLock.current = false;

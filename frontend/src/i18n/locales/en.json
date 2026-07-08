@@ -157,5 +157,56 @@
     "error": "Something went wrong.",
     "retry": "Retry",
     "back": "Back"
+  },
+  "home": {
+    "collectionEyebrow": "The collection",
+    "collectionTitle": "Our signature mists",
+    "seeAll": "See all",
+    "codTitle": "Cash on delivery",
+    "codText": "Order online, pay in cash when your parcel arrives. Zero risk.",
+    "shipTitle": "Delivery to all 58 wilayas",
+    "shipText": "Everywhere in Algeria, at home or via pickup point.",
+    "qualityTitle": "Premium quality",
+    "qualityText": "Concentrated mists crafted with carefully selected essences.",
+    "storyEyebrow": "Our story",
+    "storyTitle": "A scent signature made to last",
+    "storyText": "AV Parfums was born from a simple belief: everyone deserves a trail that feels like their own. Our fragrance mists capture moments — the softness of a sweet dream, the golden warmth of honey — in generous 200 ml formulas.",
+    "storyCta": "Discover the brand",
+    "ctaTitle": "Ready to find your signature?",
+    "ctaButton": "Explore the shop"
+  },
+  "footer": {
+    "tagline": "Luxury fragrance mists, designed in Algeria to elevate every moment.",
+    "shop": "Shop",
+    "help": "Information",
+    "account": "Account",
+    "shippingTitle": "Delivery across 58 wilayas",
+    "shippingText": "Fast shipping everywhere in Algeria.",
+    "codTitle": "Cash on delivery",
+    "codText": "Pay in cash when you receive your order.",
+    "rights": "All rights reserved.",
+    "madeIn": "Crafted with care in Algeria 🇩🇿"
+  },
+  "about": {
+    "eyebrow": "About",
+    "title": "The art of the fragrance mist",
+    "p1": "AV Parfums creates fragrance mists that pair intensity with lightness. Each scent is designed as a signature: recognisable, enveloping, faithful from morning to night.",
+    "p2": "From Sweet Dreams to Honey Touch, our creations are made with selected essences in generous 200 ml bottles — so that fragrance becomes a daily ritual, not an occasional luxury.",
+    "howTitle": "How it works",
+    "step1Title": "Order online",
+    "step1Text": "Pick your mists and check out in seconds — no account required.",
+    "step2Title": "Quick confirmation",
+    "step2Text": "Our team calls you to confirm the order and delivery address.",
+    "step3Title": "Pay on delivery",
+    "step3Text": "Receive your parcel anywhere in Algeria and pay in cash on arrival."
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "Let's talk",
+    "intro": "A question about an order, a product or a collaboration? Our team replies quickly on the channel of your choice.",
+    "emailTitle": "E-mail",
+    "phoneTitle": "Phone",
+    "hoursTitle": "Availability",
+    "hoursText": "Saturday – Thursday, 9am to 6pm. Online ordering stays open 24/7."
   }
 }

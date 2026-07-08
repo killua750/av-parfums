@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 
 import { api } from "@/lib/api";
 import type { User } from "@/lib/types";
@@ -67,10 +68,14 @@ export function useRegister() {
 
 export function useLogout() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   return useMutation({
     mutationFn: () => api("/api/v1/auth/logout/", { method: "POST" }),
     onSettled: async () => {
       qc.setQueryData(["auth", "me"], null);
+      // Leave the protected page before refetching, or the account route
+      // would refetch /auth/me and bounce through an error state.
+      await navigate({ to: "/" });
       await qc.invalidateQueries();
     },
   });

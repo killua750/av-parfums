@@ -36,6 +36,12 @@ export default function Navbar() {
           >
             {t("nav.new")}
           </Link>
+          <Link to="/about" className="hover:text-white transition">
+            {t("nav.about")}
+          </Link>
+          <Link to="/contact" className="hover:text-white transition">
+            {t("nav.contact")}
+          </Link>
           {isAdmin && (
             <Link
               to="/admin"

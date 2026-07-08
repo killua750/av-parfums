@@ -176,6 +176,7 @@ REST_FRAMEWORK = {
         "user": "300/min",
         "auth": "10/min",  # login / register endpoints
         "orders": "20/hour",  # guest checkout abuse guard
+        "dj_rest_auth": "60/min",  # dj-rest-auth's own views (logout, password, …)
     },
 }
 
