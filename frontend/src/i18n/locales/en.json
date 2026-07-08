@@ -8,7 +8,8 @@
     "login": "Log in",
     "logout": "Log out",
     "admin": "Admin",
-    "openCart": "Open cart"
+    "openCart": "Open cart",
+    "menu": "Menu"
   },
   "hero": {
     "buy": "Buy now",
