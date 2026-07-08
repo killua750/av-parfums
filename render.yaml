@@ -10,13 +10,13 @@ services:
     rootDir: backend
     plan: free
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input
-    # seed_media is idempotent (never overwrites) — it restores the bundled
-    # product images because the free disk is ephemeral. Fixtures/superuser
-    # are seeded ONCE from your machine (see DEPLOYMENT.md), never at boot,
-    # so admin edits to products/stock survive restarts.
+    # seed_media restores the bundled product images onto the ephemeral disk;
+    # bootstrap seeds fixtures ONLY into empty tables (admin edits survive
+    # restarts) and creates the superuser from the DJANGO_SUPERUSER_* vars.
     startCommand: >
       python manage.py migrate --no-input &&
       python manage.py seed_media &&
+      python manage.py bootstrap &&
       gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2
     healthCheckPath: /api/v1/health/
     envVars:
@@ -38,3 +38,7 @@ services:
         value: "True" # no Redis on the free tier: tasks run inline
       - key: ORDER_NOTIFICATION_EMAIL
         sync: false
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: admin@admin.com
+      - key: DJANGO_SUPERUSER_PASSWORD
+        generateValue: true # reveal it: Render dashboard → av-parfums-api → Environment
