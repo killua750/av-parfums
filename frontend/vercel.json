@@ -2,12 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://av-parfums-api.onrender.com/api/:path*"
+      "source": "/api/(.*)",
+      "destination": "https://av-parfums-api.onrender.com/api/$1"
     },
     {
-      "source": "/media/:path*",
-      "destination": "https://av-parfums-api.onrender.com/media/:path*"
+      "source": "/media/(.*)",
+      "destination": "https://av-parfums-api.onrender.com/media/$1"
     },
     { "source": "/((?!api/|media/|assets/).*)", "destination": "/index.html" }
   ]
