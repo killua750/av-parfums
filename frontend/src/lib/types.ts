@@ -48,6 +48,36 @@ export interface ProductDetail extends Product {
   variants: ProductVariant[];
 }
 
+export interface DashboardWindow {
+  revenue: string;
+  orders: number;
+  aov: string;
+}
+
+export interface DashboardData {
+  period_days: number;
+  totals: {
+    current: DashboardWindow;
+    previous: DashboardWindow;
+    customers: number;
+    new_customers: number;
+    new_customers_prev: number;
+    open_orders: number;
+  };
+  series: { date: string; revenue: string; orders: number }[];
+  status_counts: Partial<Record<OrderStatus, number>>;
+  top_products: { name: string; units: number; revenue: string }[];
+  low_stock: { product: string; size: string; sku: string; stock: number }[];
+  recent_orders: {
+    number: string;
+    created_at: string;
+    status: OrderStatus;
+    total: string;
+    customer: string;
+    items_count: number;
+  }[];
+}
+
 export interface Paginated<T> {
   count: number;
   next: string | null;

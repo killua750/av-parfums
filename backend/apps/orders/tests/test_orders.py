@@ -136,3 +136,53 @@ class TestStatusTransitions:
         url = reverse("admin-order-set-status", kwargs={"number": number})
         resp = auth_client.post(url, {"status": "confirmed"})
         assert resp.status_code == 403
+
+
+class TestAdminDashboard:
+    URL = reverse("admin-dashboard")
+
+    def test_requires_admin(self, api_client, auth_client):
+        assert api_client.get(self.URL).status_code in (401, 403)
+        assert auth_client.get(self.URL).status_code == 403
+
+    def test_aggregates_orders(self, admin_client, api_client, variant, wilaya):
+        api_client.post(ORDERS_URL, order_payload(variant, wilaya, qty=2), format="json")
+        api_client.post(ORDERS_URL, order_payload(variant, wilaya, qty=1), format="json")
+
+        resp = admin_client.get(self.URL)
+        assert resp.status_code == 200, resp.data
+        totals = resp.data["totals"]["current"]
+        assert totals["orders"] == 2
+        assert totals["revenue"] == "7500.00"
+        assert totals["aov"] == "3750.00"
+        assert resp.data["status_counts"] == {"pending": 2}
+        assert len(resp.data["series"]) == 30
+        assert resp.data["series"][-1]["revenue"] == "7500.00"
+        assert resp.data["top_products"][0]["units"] == 3
+        assert len(resp.data["recent_orders"]) == 2
+
+    def test_cancelled_orders_excluded_from_revenue(
+        self, admin_client, api_client, variant, wilaya
+    ):
+        resp = api_client.post(ORDERS_URL, order_payload(variant, wilaya, qty=2), format="json")
+        number = resp.data["number"]
+        admin_client.post(
+            reverse("admin-order-set-status", args=[number]),
+            {"status": "cancelled"},
+            format="json",
+        )
+        resp = admin_client.get(self.URL)
+        assert resp.data["totals"]["current"]["revenue"] == "0.00"
+        assert resp.data["status_counts"] == {"cancelled": 1}
+
+    def test_low_stock_listed(self, admin_client):
+        VariantFactory(stock=2, sku="LOW-1")
+        resp = admin_client.get(self.URL)
+        assert any(v["sku"] == "LOW-1" for v in resp.data["low_stock"])
+
+    def test_days_param_clamped(self, admin_client):
+        resp = admin_client.get(self.URL, {"days": 7})
+        assert resp.data["period_days"] == 7
+        assert len(resp.data["series"]) == 7
+        resp = admin_client.get(self.URL, {"days": "bogus"})
+        assert resp.data["period_days"] == 30
