@@ -1,11 +1,27 @@
 from django.db import connection
 from django.http import HttpResponse
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from apps.core.models import Wilaya
-from apps.core.serializers import WilayaSerializer
+from apps.core.models import StoreSettings, Wilaya
+from apps.core.permissions import IsAdmin
+from apps.core.serializers import StoreSettingsSerializer, WilayaSerializer
+
+
+class StoreSettingsView(RetrieveUpdateAPIView):
+    """GET (public) the store settings; PATCH (admin) to update them."""
+
+    serializer_class = StoreSettingsSerializer
+
+    def get_permissions(self):
+        if self.request.method in ("GET", "HEAD", "OPTIONS"):
+            return [AllowAny()]
+        return [IsAdmin()]
+
+    def get_object(self):
+        return StoreSettings.load()
 
 
 @api_view(["GET"])

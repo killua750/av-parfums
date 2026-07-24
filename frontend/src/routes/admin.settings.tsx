@@ -1,8 +1,9 @@
-// Admin settings: account info + change password (back-office).
+// Admin settings: store settings (WhatsApp number…), account, change password.
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { KeyRound, ShieldCheck } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { KeyRound, Save, ShieldCheck } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -11,6 +12,7 @@ import { z } from "zod";
 import { Panel } from "@/components/admin/viz";
 import { useUser } from "@/hooks/useAuth";
 import { api, apiErrorMessage } from "@/lib/api";
+import type { StoreSettings } from "@/lib/types";
 
 export const Route = createFileRoute("/admin/settings")({
   head: () => ({ meta: [{ title: "Admin · Paramètres — AV Parfums" }] }),
@@ -64,6 +66,8 @@ function AdminSettings() {
         </h1>
         <p className="mt-1 text-sm text-white/40">{t("admin.settingsSub")}</p>
       </div>
+
+      <StoreSettingsPanel />
 
       <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
         {/* Account */}
@@ -136,5 +140,80 @@ function AdminSettings() {
         </Panel>
       </div>
     </div>
+  );
+}
+
+const FIELDS: { key: keyof StoreSettings; labelKey: string; type?: string; hintKey?: string }[] = [
+  { key: "whatsapp_number", labelKey: "admin.whatsappNumber", hintKey: "admin.whatsappHint" },
+  { key: "store_name", labelKey: "admin.storeName" },
+  { key: "contact_phone", labelKey: "admin.contactPhone" },
+  { key: "contact_email", labelKey: "admin.contactEmail", type: "email" },
+  { key: "instagram", labelKey: "admin.instagram" },
+  { key: "free_shipping_threshold", labelKey: "admin.freeShipping", type: "number" },
+];
+
+function StoreSettingsPanel() {
+  const { t } = useTranslation();
+  const qc = useQueryClient();
+  const { data } = useQuery<StoreSettings>({
+    queryKey: ["settings"],
+    queryFn: () => api<StoreSettings>("/api/v1/settings/"),
+  });
+  const [form, setForm] = useState<StoreSettings | null>(null);
+  useEffect(() => {
+    if (data) setForm(data);
+  }, [data]);
+
+  const save = useMutation({
+    mutationFn: (body: StoreSettings) =>
+      api<StoreSettings>("/api/v1/settings/", { method: "PATCH", body }),
+    onSuccess: (updated) => {
+      qc.setQueryData(["settings"], updated);
+      toast.success(t("admin.saved"));
+    },
+    onError: (err) => toast.error(apiErrorMessage(err, t("common.error"))),
+  });
+
+  const inputCls =
+    "w-full rounded-xl border border-white/10 bg-white/[0.07] px-3.5 py-2.5 text-sm " +
+    "placeholder:text-white/30 focus:border-white/40 focus:outline-none transition";
+  const labelCls = "mb-1.5 block text-xs font-medium text-white/50";
+
+  return (
+    <Panel title={t("admin.storeSettings")}>
+      {!form ? (
+        <div className="h-40 rounded-xl skeleton" />
+      ) : (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            save.mutate(form);
+          }}
+        >
+          <div className="grid gap-4 sm:grid-cols-2">
+            {FIELDS.map(({ key, labelKey, type, hintKey }) => (
+              <div key={key}>
+                <label className={labelCls}>{t(labelKey)}</label>
+                <input
+                  type={type ?? "text"}
+                  value={form[key] ?? ""}
+                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                  className={inputCls}
+                />
+                {hintKey && <p className="mt-1 text-[11px] text-white/35">{t(hintKey)}</p>}
+              </div>
+            ))}
+          </div>
+          <button
+            type="submit"
+            disabled={save.isPending}
+            className="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-white/90 disabled:opacity-50"
+          >
+            <Save size={15} />
+            {save.isPending ? t("admin.saving") : t("admin.save")}
+          </button>
+        </form>
+      )}
+    </Panel>
   );
 }

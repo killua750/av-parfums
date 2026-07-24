@@ -43,9 +43,7 @@ class Command(BaseCommand):
         rows = json.loads(FIXTURE.read_text(encoding="utf-8"))
         # Map the fixture's product pk -> slug so variants resolve to the right
         # product by slug (live DB ids may differ from fixture pks).
-        pk_to_slug = {
-            r["pk"]: r["fields"]["slug"] for r in rows if r["model"] == "catalog.product"
-        }
+        pk_to_slug = {r["pk"]: r["fields"]["slug"] for r in rows if r["model"] == "catalog.product"}
         # Ensure the default category first (products reference it by fixture pk).
         default_category = None
         for row in rows:

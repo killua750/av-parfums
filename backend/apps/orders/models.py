@@ -47,6 +47,7 @@ class Order(TimeStampedModel):
     subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     shipping_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    cancel_reason = models.CharField(max_length=200, blank=True)
 
     class Meta:
         ordering = ["-created_at"]

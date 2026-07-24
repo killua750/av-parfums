@@ -177,7 +177,17 @@ export interface Order {
   subtotal: string;
   shipping_fee: string;
   total: string;
+  cancel_reason?: string;
   items: OrderItem[];
   shipping_address: ShippingAddress;
   created_at: string;
+}
+
+export interface StoreSettings {
+  whatsapp_number: string;
+  store_name: string;
+  contact_email: string;
+  contact_phone: string;
+  instagram: string;
+  free_shipping_threshold: string;
 }

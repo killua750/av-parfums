@@ -343,8 +343,11 @@ class AdminOrderViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewse
         serializer.is_valid(raise_exception=True)
         new_status = serializer.validated_data["status"]
 
+        update_fields = ["status", "updated_at"]
         with transaction.atomic():
             if new_status == OrderStatus.CANCELLED:
+                order.cancel_reason = serializer.validated_data.get("cancel_reason", "")
+                update_fields.append("cancel_reason")
                 # Return reserved stock when an order is called off.
                 for item in order.items.select_related("variant"):
                     if item.variant_id:
@@ -352,6 +355,6 @@ class AdminOrderViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewse
                             stock=F("stock") + item.quantity
                         )
             order.status = new_status
-            order.save(update_fields=["status", "updated_at"])
+            order.save(update_fields=update_fields)
 
         return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)

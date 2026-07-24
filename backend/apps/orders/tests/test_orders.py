@@ -126,7 +126,7 @@ class TestStatusTransitions:
         variant.refresh_from_db()
         assert variant.stock == 8
         url = reverse("admin-order-set-status", kwargs={"number": number})
-        resp = admin_client.post(url, {"status": "cancelled"})
+        resp = admin_client.post(url, {"status": "cancelled", "cancel_reason": "injoignable"})
         assert resp.status_code == 200
         variant.refresh_from_db()
         assert variant.stock == 10
@@ -170,7 +170,7 @@ class TestAdminDashboard:
         number = resp.data["number"]
         admin_client.post(
             reverse("admin-order-set-status", args=[number]),
-            {"status": "cancelled"},
+            {"status": "cancelled", "cancel_reason": "injoignable"},
             format="json",
         )
         resp = admin_client.get(self.URL)
@@ -189,3 +189,16 @@ class TestAdminDashboard:
         # Unknown preset falls back to this_month.
         resp = admin_client.get(self.URL, {"period": "bogus"})
         assert resp.data["period"]["preset"] == "this_month"
+
+
+class TestCancelReason:
+    def test_cancel_requires_reason(self, api_client, admin_client, variant, wilaya):
+        resp = api_client.post(ORDERS_URL, order_payload(variant, wilaya, qty=1), format="json")
+        number = resp.data["number"]
+        url = reverse("admin-order-set-status", kwargs={"number": number})
+        # No reason → rejected.
+        assert admin_client.post(url, {"status": "cancelled"}).status_code == 400
+        # With reason → stored.
+        ok = admin_client.post(url, {"status": "cancelled", "cancel_reason": "hors zone"})
+        assert ok.status_code == 200
+        assert ok.data["cancel_reason"] == "hors zone"

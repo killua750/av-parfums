@@ -50,6 +50,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "subtotal",
             "shipping_fee",
             "total",
+            "cancel_reason",
             "items",
             "shipping_address",
             "created_at",
@@ -145,9 +146,17 @@ class OrderCreateSerializer(serializers.Serializer):
 
 class OrderStatusUpdateSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=OrderStatus.choices)
+    cancel_reason = serializers.CharField(max_length=200, required=False, allow_blank=True)
 
     def validate_status(self, value: str) -> str:
         order: Order = self.context["order"]
         if not order.can_transition_to(value):
             raise serializers.ValidationError(f"Transition invalide: {order.status} → {value}.")
         return value
+
+    def validate(self, attrs):
+        if attrs["status"] == OrderStatus.CANCELLED and not attrs.get("cancel_reason", "").strip():
+            raise serializers.ValidationError(
+                {"cancel_reason": "Le motif d'annulation est obligatoire."}
+            )
+        return attrs
