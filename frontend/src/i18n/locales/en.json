@@ -208,12 +208,7 @@
     "reasonOther": "Specify the reason…",
     "back": "Back",
     "confirmCancel": "Confirm cancellation",
-    "reason": {
-      "unreachable": "Customer unreachable",
-      "refused": "Refused on delivery",
-      "out_of_zone": "Out of delivery zone",
-      "other": "Other"
-    },
+    "reason": "Reason",
     "storeSettings": "Store settings",
     "whatsappNumber": "WhatsApp number",
     "whatsappHint": "International format without +, e.g. 213550000000",
@@ -221,7 +216,23 @@
     "contactPhone": "Contact phone",
     "contactEmail": "Contact e-mail",
     "instagram": "Instagram",
-    "freeShipping": "Free-shipping threshold (DA)"
+    "freeShipping": "Free-shipping threshold (DA)",
+    "margin": "Margin",
+    "sales": "Sales",
+    "views": "Views",
+    "cost": "Cost",
+    "marginEstimate": "Est. margin",
+    "adjustStock": "Adjust stock",
+    "currentStock": "Current stock",
+    "movement": "Movement (+/-)",
+    "movementHint": "e.g. +10 or -5",
+    "note": "Note",
+    "stockReason": {
+      "restock": "Restock",
+      "correction": "Inventory correction",
+      "damage": "Damage / loss",
+      "return": "Customer return"
+    }
   },
   "common": {
     "loading": "Loading...",

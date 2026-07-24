@@ -208,12 +208,7 @@
     "reasonOther": "حدّد السبب…",
     "back": "رجوع",
     "confirmCancel": "تأكيد الإلغاء",
-    "reason": {
-      "unreachable": "العميل غير متاح",
-      "refused": "رفض عند التسليم",
-      "out_of_zone": "خارج منطقة التوصيل",
-      "other": "أخرى"
-    },
+    "reason": "السبب",
     "storeSettings": "إعدادات المتجر",
     "whatsappNumber": "رقم واتساب",
     "whatsappHint": "الصيغة الدولية بدون +، مثال: 213550000000",
@@ -221,7 +216,23 @@
     "contactPhone": "هاتف التواصل",
     "contactEmail": "البريد الإلكتروني",
     "instagram": "إنستغرام",
-    "freeShipping": "حد الشحن المجاني (دج)"
+    "freeShipping": "حد الشحن المجاني (دج)",
+    "margin": "الهامش",
+    "sales": "المبيعات",
+    "views": "المشاهدات",
+    "cost": "التكلفة",
+    "marginEstimate": "الهامش المقدّر",
+    "adjustStock": "تعديل المخزون",
+    "currentStock": "المخزون الحالي",
+    "movement": "الحركة (+/-)",
+    "movementHint": "مثال +10 أو -5",
+    "note": "ملاحظة",
+    "stockReason": {
+      "restock": "إعادة تخزين",
+      "correction": "تصحيح الجرد",
+      "damage": "تلف / خسارة",
+      "return": "إرجاع عميل"
+    }
   },
   "common": {
     "loading": "جارٍ التحميل...",

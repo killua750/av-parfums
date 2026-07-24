@@ -208,12 +208,7 @@
     "reasonOther": "Précisez le motif…",
     "back": "Retour",
     "confirmCancel": "Confirmer l'annulation",
-    "reason": {
-      "unreachable": "Client injoignable",
-      "refused": "Refusé à la livraison",
-      "out_of_zone": "Hors zone de livraison",
-      "other": "Autre"
-    },
+    "reason": "Motif",
     "storeSettings": "Paramètres de la boutique",
     "whatsappNumber": "Numéro WhatsApp",
     "whatsappHint": "Format international sans +, ex : 213550000000",
@@ -221,7 +216,23 @@
     "contactPhone": "Téléphone de contact",
     "contactEmail": "E-mail de contact",
     "instagram": "Instagram",
-    "freeShipping": "Seuil livraison gratuite (DA)"
+    "freeShipping": "Seuil livraison gratuite (DA)",
+    "margin": "Marge",
+    "sales": "Ventes",
+    "views": "Vues",
+    "cost": "Coût",
+    "marginEstimate": "Marge estimée",
+    "adjustStock": "Ajuster le stock",
+    "currentStock": "Stock actuel",
+    "movement": "Mouvement (+/-)",
+    "movementHint": "ex. +10 ou -5",
+    "note": "Note",
+    "stockReason": {
+      "restock": "Réapprovisionnement",
+      "correction": "Correction d'inventaire",
+      "damage": "Casse / perte",
+      "return": "Retour client"
+    }
   },
   "common": {
     "loading": "Chargement...",

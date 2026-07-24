@@ -89,3 +89,44 @@ class TestAdminCatalog:
             format="json",
         )
         assert resp.status_code == 400
+
+
+@pytest.mark.django_db
+class TestProductStatsAndStock:
+    def test_admin_product_exposes_cost_margin_and_stats(self, admin_client, variant):
+        variant.cost = "1000.00"
+        variant.price = "2500.00"
+        variant.save()
+        resp = admin_client.get(reverse("admin-product-list"))
+        p = resp.data["results"][0]
+        assert "views" in p and "units_sold" in p and "revenue" in p and "total_stock" in p
+        v = p["variants"][0]
+        assert v["cost"] == "1000.00"
+        assert v["margin_pct"] == 60.0  # (2500-1000)/2500
+
+    def test_public_detail_never_exposes_cost(self, api_client, variant):
+        resp = api_client.get(reverse("product-detail", kwargs={"slug": variant.product.slug}))
+        assert "cost" not in resp.data["variants"][0]
+        assert "margin_pct" not in resp.data["variants"][0]
+
+    def test_product_view_increments(self, api_client, variant):
+        slug = variant.product.slug
+        api_client.get(reverse("product-detail", kwargs={"slug": slug}))
+        api_client.get(reverse("product-detail", kwargs={"slug": slug}))
+        variant.product.refresh_from_db()
+        assert variant.product.views == 2
+
+    def test_stock_adjustment_logs_movement(self, admin_client, variant):
+        variant.stock = 10
+        variant.save()
+        url = reverse("admin-product-stock", kwargs={"pk": variant.product.pk})
+        resp = admin_client.post(
+            url, {"variant_id": variant.id, "delta": 7, "reason": "restock"}, format="json"
+        )
+        assert resp.status_code == 201
+        assert resp.data["resulting_stock"] == 17
+        variant.refresh_from_db()
+        assert variant.stock == 17
+        # negative beyond available is rejected
+        bad = admin_client.post(url, {"variant_id": variant.id, "delta": -100}, format="json")
+        assert bad.status_code == 400

@@ -40,6 +40,7 @@ class Product(TimeStampedModel):
     background_image = models.ImageField(upload_to="products/backgrounds/", blank=True, null=True)
     is_active = models.BooleanField(default=True, db_index=True)
     featured = models.BooleanField(default=False, help_text="Shown in the home hero carousel.")
+    views = models.PositiveIntegerField(default=0, help_text="Detail-page view counter.")
 
     class Meta:
         ordering = ["-created_at"]
@@ -79,6 +80,13 @@ class ProductVariant(TimeStampedModel):
     sku = models.CharField(max_length=40, unique=True)
     size = models.CharField(max_length=40)  # e.g. "Brume 200ml"
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    cost = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        validators=[MinValueValidator(0)],
+        help_text="Cost of revenue, for automatic margin.",
+    )
     stock = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -94,3 +102,27 @@ class ProductVariant(TimeStampedModel):
     @property
     def in_stock(self) -> bool:
         return self.stock > 0
+
+
+class StockMovement(models.Model):
+    """Timestamped stock entry/exit ledger per variant, for stock history and
+    low-stock auditing. `delta` is positive for restocks, negative for exits."""
+
+    class Reason(models.TextChoices):
+        RESTOCK = "restock", "Réapprovisionnement"
+        CORRECTION = "correction", "Correction d'inventaire"
+        DAMAGE = "damage", "Casse / perte"
+        RETURN = "return", "Retour client"
+
+    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, related_name="movements")
+    delta = models.IntegerField(help_text="Positive = entrée, négative = sortie.")
+    resulting_stock = models.PositiveIntegerField()
+    reason = models.CharField(max_length=20, choices=Reason.choices, default=Reason.RESTOCK)
+    note = models.CharField(max_length=200, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.variant.sku} {self.delta:+d} ({self.reason})"

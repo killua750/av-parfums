@@ -1,14 +1,20 @@
+from django.db.models import F
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.response import Response
 
 from apps.catalog.filters import ProductFilter, full_text_search
-from apps.catalog.models import Category, Product
+from apps.catalog.models import Category, Product, ProductVariant, StockMovement
 from apps.catalog.serializers import (
+    AdminProductSerializer,
     CategorySerializer,
     ProductDetailSerializer,
     ProductListSerializer,
     ProductWriteSerializer,
+    StockMovementSerializer,
 )
 from apps.core.permissions import IsAdmin
 
@@ -42,6 +48,12 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     def get_serializer_class(self):
         return ProductDetailSerializer if self.action == "retrieve" else ProductListSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        # Count product-detail views (best-effort, race-free via F()).
+        instance = self.get_object()
+        Product.objects.filter(pk=instance.pk).update(views=F("views") + 1)
+        return Response(self.get_serializer(instance).data)
+
 
 class AdminProductViewSet(viewsets.ModelViewSet):
     """Full CRUD under /api/v1/admin/products — IsAdmin enforced server-side."""
@@ -55,8 +67,43 @@ class AdminProductViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ("list", "retrieve"):
-            return ProductDetailSerializer
+            return AdminProductSerializer
         return ProductWriteSerializer
+
+    @action(detail=True, methods=["get", "post"])
+    def stock(self, request, pk=None):
+        """GET: recent stock movements for the product's variants.
+        POST {variant_id, delta, reason, note}: adjust stock + log a movement."""
+        product = self.get_object()
+        if request.method == "GET":
+            movements = StockMovement.objects.filter(variant__product=product).select_related(
+                "variant"
+            )[:50]
+            return Response(StockMovementSerializer(movements, many=True).data)
+
+        variant = get_object_or_404(
+            ProductVariant, pk=request.data.get("variant_id"), product=product
+        )
+        try:
+            delta = int(request.data.get("delta", 0))
+        except (TypeError, ValueError):
+            return Response({"delta": "Invalide."}, status=status.HTTP_400_BAD_REQUEST)
+        new_stock = variant.stock + delta
+        if delta == 0 or new_stock < 0:
+            return Response(
+                {"delta": "Ajustement invalide (stock négatif)."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        variant.stock = new_stock
+        variant.save(update_fields=["stock", "updated_at"])
+        movement = StockMovement.objects.create(
+            variant=variant,
+            delta=delta,
+            resulting_stock=new_stock,
+            reason=request.data.get("reason", StockMovement.Reason.RESTOCK),
+            note=request.data.get("note", ""),
+        )
+        return Response(StockMovementSerializer(movement).data, status=status.HTTP_201_CREATED)
 
 
 class AdminCategoryViewSet(viewsets.ModelViewSet):

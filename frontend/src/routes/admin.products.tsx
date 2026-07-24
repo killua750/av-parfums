@@ -3,14 +3,14 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import { Boxes, Eye, ImagePlus, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { Panel, VIZ } from "@/components/admin/viz";
 import { api, apiErrorMessage } from "@/lib/api";
-import { formatDA } from "@/lib/format";
-import type { Category, Paginated, ProductDetail } from "@/lib/types";
+import { formatDA, formatDACompact } from "@/lib/format";
+import type { AdminProduct, Category, Paginated, StockReason } from "@/lib/types";
 
 export const Route = createFileRoute("/admin/products")({
   head: () => ({ meta: [{ title: "Admin · Produits — AV Parfums" }] }),
@@ -25,6 +25,7 @@ interface ProductFormState {
   description: string;
   tint: string;
   price: string;
+  cost: string;
   stock: string;
   size: string;
   sku: string;
@@ -41,20 +42,32 @@ const EMPTY_FORM: ProductFormState = {
   description: "",
   tint: "#E88BB0",
   price: "",
+  cost: "",
   stock: "0",
   size: "Brume 200ml",
   sku: "",
 };
 
+interface StockAdjust {
+  productId: number;
+  variantId: number;
+  productName: string;
+  currentStock: number;
+  delta: string;
+  reason: StockReason;
+  note: string;
+}
+
 function AdminProducts() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const [form, setForm] = useState<ProductFormState | null>(null);
+  const [stockAdjust, setStockAdjust] = useState<StockAdjust | null>(null);
   const [query, setQuery] = useState("");
 
-  const { data, isPending } = useQuery<Paginated<ProductDetail>>({
+  const { data, isPending } = useQuery<Paginated<AdminProduct>>({
     queryKey: ["admin", "products"],
-    queryFn: () => api<Paginated<ProductDetail>>("/api/v1/admin/products/"),
+    queryFn: () => api<Paginated<AdminProduct>>("/api/v1/admin/products/"),
   });
   const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ["categories"],
@@ -89,10 +102,10 @@ function AdminProducts() {
       // Nested variants must go as JSON — send via a second JSON PATCH, since
       // multipart + nested writes don't mix.
       const product = f.id
-        ? await api<ProductDetail>(`/api/v1/admin/products/${f.id}/`, { method: "PATCH", body })
-        : await api<ProductDetail>("/api/v1/admin/products/", { method: "POST", body });
+        ? await api<AdminProduct>(`/api/v1/admin/products/${f.id}/`, { method: "PATCH", body })
+        : await api<AdminProduct>("/api/v1/admin/products/", { method: "POST", body });
       if (f.price) {
-        await api<ProductDetail>(`/api/v1/admin/products/${product.id}/`, {
+        await api<AdminProduct>(`/api/v1/admin/products/${product.id}/`, {
           method: "PATCH",
           body: {
             variants: [
@@ -100,6 +113,7 @@ function AdminProducts() {
                 sku: f.sku || `AV-${product.id}-${Date.now() % 10000}`,
                 size: f.size,
                 price: f.price,
+                cost: f.cost || "0",
                 stock: parseInt(f.stock || "0", 10),
               },
             ],
@@ -121,6 +135,31 @@ function AdminProducts() {
     onSuccess: invalidate,
     onError: (err) => toast.error(apiErrorMessage(err, t("common.error"))),
   });
+
+  const adjustStock = useMutation({
+    mutationFn: (a: StockAdjust) =>
+      api(`/api/v1/admin/products/${a.productId}/stock/`, {
+        method: "POST",
+        body: {
+          variant_id: a.variantId,
+          delta: parseInt(a.delta, 10),
+          reason: a.reason,
+          note: a.note,
+        },
+      }),
+    onSuccess: () => {
+      toast.success(t("admin.saved"));
+      setStockAdjust(null);
+      invalidate();
+    },
+    onError: (err) => toast.error(apiErrorMessage(err, t("common.error"))),
+  });
+
+  const margin = (() => {
+    const price = parseFloat(form?.price || "0");
+    const cost = parseFloat(form?.cost || "0");
+    return price > 0 ? Math.round(((price - cost) / price) * 100) : null;
+  })();
 
   const inputCls =
     "w-full px-3.5 py-2.5 rounded-xl bg-white/[0.07] border border-white/10 text-sm " +
@@ -185,10 +224,11 @@ function AdminProducts() {
                   style={{ color: VIZ.muted }}
                 >
                   <th className="px-5 py-3.5 font-medium">{t("admin.name")}</th>
-                  <th className="px-5 py-3.5 font-medium">{t("admin.category")}</th>
                   <th className="px-5 py-3.5 font-medium text-right">{t("admin.price")}</th>
+                  <th className="px-5 py-3.5 font-medium text-right">{t("admin.margin")}</th>
+                  <th className="px-5 py-3.5 font-medium text-right">{t("admin.sales")}</th>
+                  <th className="px-5 py-3.5 font-medium text-right">{t("admin.views")}</th>
                   <th className="px-5 py-3.5 font-medium text-right">{t("admin.stock")}</th>
-                  <th className="px-5 py-3.5 font-medium">{t("admin.status")}</th>
                   <th className="px-5 py-3.5" />
                 </tr>
               </thead>
@@ -228,7 +268,6 @@ function AdminProducts() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-5 py-3 text-white/60">{p.category?.name ?? "—"}</td>
                       <td
                         className="px-5 py-3 text-right font-medium"
                         style={{ fontVariantNumeric: "tabular-nums" }}
@@ -239,18 +278,59 @@ function AdminProducts() {
                         className="px-5 py-3 text-right"
                         style={{ fontVariantNumeric: "tabular-nums" }}
                       >
-                        {variant?.stock ?? "—"}
+                        {variant?.margin_pct != null ? (
+                          <span
+                            style={{ color: variant.margin_pct >= 40 ? VIZ.good : VIZ.warning }}
+                          >
+                            {variant.margin_pct}%
+                          </span>
+                        ) : (
+                          "—"
+                        )}
                       </td>
-                      <td className="px-5 py-3">
-                        <span
-                          className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                      <td
+                        className="px-5 py-3 text-right"
+                        style={{ fontVariantNumeric: "tabular-nums" }}
+                      >
+                        <p className="font-medium">
+                          {t("admin.unitsShort", { count: p.units_sold })}
+                        </p>
+                        <p className="text-xs" style={{ color: VIZ.muted }}>
+                          {formatDACompact(p.revenue)}
+                        </p>
+                      </td>
+                      <td
+                        className="px-5 py-3 text-right"
+                        style={{ fontVariantNumeric: "tabular-nums", color: VIZ.muted }}
+                      >
+                        <span className="inline-flex items-center gap-1">
+                          <Eye size={13} /> {p.views}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-right">
+                        <button
+                          onClick={() =>
+                            variant &&
+                            setStockAdjust({
+                              productId: p.id,
+                              variantId: variant.id,
+                              productName: p.name,
+                              currentStock: p.total_stock,
+                              delta: "",
+                              reason: "restock",
+                              note: "",
+                            })
+                          }
+                          className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition hover:bg-white/10"
                           style={{
-                            color: p.in_stock ? VIZ.good : VIZ.critical,
-                            backgroundColor: (p.in_stock ? VIZ.good : VIZ.critical) + "1f",
+                            fontVariantNumeric: "tabular-nums",
+                            borderColor:
+                              p.total_stock === 0 ? VIZ.critical + "66" : "rgba(255,255,255,0.15)",
+                            color: p.total_stock === 0 ? VIZ.critical : "#fff",
                           }}
                         >
-                          {p.in_stock ? t("admin.active") : t("shop.outOfStock")}
-                        </span>
+                          <Boxes size={13} /> {p.total_stock}
+                        </button>
                       </td>
                       <td className="px-5 py-3 text-right whitespace-nowrap">
                         <button
@@ -263,6 +343,7 @@ function AdminProducts() {
                               description: p.description,
                               tint: p.tint,
                               price: variant?.price ?? "",
+                              cost: variant?.cost ?? "",
                               stock: String(variant?.stock ?? 0),
                               size: variant?.size ?? "Brume 200ml",
                               sku: variant?.sku ?? "",
@@ -293,7 +374,7 @@ function AdminProducts() {
                 {products.length === 0 && (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={7}
                       className="px-5 py-10 text-center text-sm"
                       style={{ color: VIZ.muted }}
                     >
@@ -403,6 +484,27 @@ function AdminProducts() {
                   />
                 </div>
                 <div>
+                  <label className={labelCls}>{t("admin.cost")} (DA)</label>
+                  <input
+                    value={form.cost}
+                    onChange={(e) => setForm({ ...form, cost: e.target.value })}
+                    inputMode="decimal"
+                    placeholder="0"
+                    className={inputCls}
+                  />
+                </div>
+                {margin != null && (
+                  <div className="col-span-2 -mt-1 flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2 text-sm">
+                    <span style={{ color: VIZ.muted }}>{t("admin.marginEstimate")}</span>
+                    <span
+                      className="font-semibold"
+                      style={{ color: margin >= 40 ? VIZ.good : VIZ.warning }}
+                    >
+                      {margin}%
+                    </span>
+                  </div>
+                )}
+                <div>
                   <label className={labelCls}>{t("admin.stock")}</label>
                   <input
                     value={form.stock}
@@ -474,6 +576,73 @@ function AdminProducts() {
               className="mt-6 w-full rounded-full bg-white py-3.5 text-sm font-semibold uppercase tracking-widest text-black transition hover:bg-white/90 disabled:opacity-40"
             >
               {save.isPending ? t("common.loading") : t("admin.save")}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Stock adjustment modal */}
+      {stockAdjust && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            aria-label={t("cart.close")}
+            onClick={() => setStockAdjust(null)}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          />
+          <div
+            className="relative w-full max-w-sm rounded-2xl border border-white/10 p-6"
+            style={{ backgroundColor: "#161615" }}
+          >
+            <h2 className="mb-1 text-lg font-bold uppercase tracking-widest">
+              {t("admin.adjustStock")}
+            </h2>
+            <p className="mb-5 text-sm" style={{ color: VIZ.muted }}>
+              {stockAdjust.productName} · {t("admin.currentStock")}: {stockAdjust.currentStock}
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className={labelCls}>{t("admin.movement")}</label>
+                <input
+                  value={stockAdjust.delta}
+                  onChange={(e) => setStockAdjust({ ...stockAdjust, delta: e.target.value })}
+                  inputMode="numeric"
+                  placeholder={t("admin.movementHint")}
+                  className={inputCls}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>{t("admin.reason")}</label>
+                <select
+                  value={stockAdjust.reason}
+                  onChange={(e) =>
+                    setStockAdjust({ ...stockAdjust, reason: e.target.value as StockReason })
+                  }
+                  className={`${inputCls} [&>option]:text-black`}
+                >
+                  {(["restock", "correction", "damage", "return"] as StockReason[]).map((r) => (
+                    <option key={r} value={r}>
+                      {t(`admin.stockReason.${r}`)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={labelCls}>{t("admin.note")}</label>
+                <input
+                  value={stockAdjust.note}
+                  onChange={(e) => setStockAdjust({ ...stockAdjust, note: e.target.value })}
+                  className={inputCls}
+                />
+              </div>
+            </div>
+            <button
+              onClick={() => adjustStock.mutate(stockAdjust)}
+              disabled={
+                adjustStock.isPending || !stockAdjust.delta || parseInt(stockAdjust.delta, 10) === 0
+              }
+              className="mt-6 w-full rounded-full bg-white py-3 text-sm font-semibold uppercase tracking-widest text-black transition hover:bg-white/90 disabled:opacity-40"
+            >
+              {adjustStock.isPending ? t("common.loading") : t("admin.save")}
             </button>
           </div>
         </div>

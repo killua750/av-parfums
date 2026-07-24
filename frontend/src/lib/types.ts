@@ -16,6 +16,8 @@ export interface ProductVariant {
   price: string;
   stock: number;
   in_stock: boolean;
+  cost?: string;
+  margin_pct?: number;
 }
 
 export interface ProductImage {
@@ -46,6 +48,29 @@ export interface Product {
 export interface ProductDetail extends Product {
   images: ProductImage[];
   variants: ProductVariant[];
+}
+
+/** Admin product list/detail — adds cost/margin (on variants) + per-product stats. */
+export interface AdminProduct extends ProductDetail {
+  views: number;
+  units_sold: number;
+  revenue: string;
+  total_stock: number;
+  is_active: boolean;
+}
+
+export type StockReason = "restock" | "correction" | "damage" | "return";
+
+export interface StockMovement {
+  id: number;
+  variant: number;
+  variant_sku: string;
+  variant_size: string;
+  delta: number;
+  resulting_stock: number;
+  reason: StockReason;
+  note: string;
+  created_at: string;
 }
 
 export type PeriodPreset =
