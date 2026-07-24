@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.db.models import Count, F, Sum
+from django.db.models import Count, F, Max, Q, Sum
 from django.db.models.functions import (
     ExtractHour,
     ExtractIsoWeekDay,
@@ -358,3 +358,77 @@ class AdminOrderViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewse
             order.save(update_fields=update_fields)
 
         return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
+
+
+class AdminCustomersView(APIView):
+    """Customer directory aggregated by delivery phone (COD orders are mostly
+    guest, so phone is the stable identity). Sorted by lifetime spend."""
+
+    permission_classes = [IsAdmin]
+
+    def get(self, request):
+        from apps.core.models import StoreSettings
+
+        vip_threshold = StoreSettings.load().vip_threshold or Decimal("0")
+        search = request.query_params.get("search", "").strip().lower()
+
+        base = Order.objects.filter(shipping_address__isnull=False)
+        rows = (
+            base.values(phone=F("shipping_address__phone"))
+            .annotate(
+                orders=Count("id"),
+                spent=Sum("total", filter=~Q(status=OrderStatus.CANCELLED)),
+                delivered=Count("id", filter=Q(status=OrderStatus.DELIVERED)),
+                last_order=Max("created_at"),
+            )
+            .order_by("-spent")
+        )
+
+        # Latest name + wilaya per phone (single ordered pass).
+        latest: dict[str, tuple[str, str]] = {}
+        for o in base.select_related("shipping_address__wilaya").order_by(
+            "shipping_address__phone", "-created_at"
+        ):
+            addr = o.shipping_address
+            latest.setdefault(addr.phone, (addr.full_name, addr.wilaya.name))
+
+        customers = []
+        for r in rows:
+            phone = r["phone"]
+            name, wilaya = latest.get(phone, ("", ""))
+            spent = r["spent"] or Decimal("0")
+            if search and search not in name.lower() and search not in phone.lower():
+                continue
+            customers.append(
+                {
+                    "phone": phone,
+                    "name": name,
+                    "wilaya": wilaya,
+                    "orders": r["orders"],
+                    "delivered": r["delivered"],
+                    "spent": str(spent),
+                    "aov": str((spent / r["orders"]).quantize(Decimal("0.01")))
+                    if r["orders"]
+                    else "0",
+                    "last_order": r["last_order"].isoformat() if r["last_order"] else None,
+                    "is_vip": spent >= vip_threshold,
+                }
+            )
+
+        return Response({"vip_threshold": str(vip_threshold), "customers": customers})
+
+
+class AdminCustomerOrdersView(APIView):
+    """Full order history for one customer (by phone)."""
+
+    permission_classes = [IsAdmin]
+
+    def get(self, request):
+        phone = request.query_params.get("phone", "")
+        orders = (
+            Order.objects.filter(shipping_address__phone=phone)
+            .prefetch_related("items")
+            .select_related("shipping_address__wilaya")
+            .order_by("-created_at")
+        )
+        return Response(OrderSerializer(orders, many=True).data)

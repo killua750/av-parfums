@@ -11,6 +11,7 @@ import {
   Package,
   Settings,
   ShoppingBag,
+  Users,
   X,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -42,8 +43,9 @@ export const Route = createFileRoute("/admin")({
 
 const NAV = [
   { to: "/admin", icon: LayoutDashboard, labelKey: "admin.overview", exact: true },
-  { to: "/admin/products", icon: Package, labelKey: "admin.products", exact: false },
   { to: "/admin/orders", icon: ShoppingBag, labelKey: "admin.orders", exact: false },
+  { to: "/admin/products", icon: Package, labelKey: "admin.products", exact: false },
+  { to: "/admin/customers", icon: Users, labelKey: "admin.customers", exact: false },
   { to: "/admin/settings", icon: Settings, labelKey: "admin.settings", exact: false },
 ] as const;
 

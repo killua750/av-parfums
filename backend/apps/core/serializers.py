@@ -19,4 +19,5 @@ class StoreSettingsSerializer(serializers.ModelSerializer):
             "contact_phone",
             "instagram",
             "free_shipping_threshold",
+            "vip_threshold",
         ]

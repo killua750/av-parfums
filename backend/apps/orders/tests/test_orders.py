@@ -202,3 +202,26 @@ class TestCancelReason:
         ok = admin_client.post(url, {"status": "cancelled", "cancel_reason": "hors zone"})
         assert ok.status_code == 200
         assert ok.data["cancel_reason"] == "hors zone"
+
+
+class TestAdminCustomers:
+    URL = reverse("admin-customers")
+
+    def test_requires_admin(self, api_client, auth_client):
+        assert api_client.get(self.URL).status_code in (401, 403)
+        assert auth_client.get(self.URL).status_code == 403
+
+    def test_aggregates_by_phone_with_vip(self, admin_client, api_client, variant, wilaya):
+        # Two orders from the same phone → one customer, spend summed.
+        for _ in range(2):
+            api_client.post(ORDERS_URL, order_payload(variant, wilaya, qty=3), format="json")
+        resp = admin_client.get(self.URL)
+        assert resp.status_code == 200
+        customers = resp.data["customers"]
+        assert len(customers) == 1
+        c = customers[0]
+        assert c["orders"] == 2
+        assert float(c["spent"]) > 0
+        # order history endpoint returns both
+        hist = admin_client.get(reverse("admin-customer-orders"), {"phone": c["phone"]})
+        assert len(hist.data) == 2

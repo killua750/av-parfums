@@ -36,6 +36,12 @@ class StoreSettings(models.Model):
     contact_phone = models.CharField(max_length=20, blank=True)
     instagram = models.CharField(max_length=200, blank=True)
     free_shipping_threshold = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    vip_threshold = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=20000,
+        help_text="Total spend (DA) above which a customer is flagged VIP.",
+    )
 
     class Meta:
         verbose_name = "store settings"

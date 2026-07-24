@@ -232,7 +232,14 @@
       "correction": "Inventory correction",
       "damage": "Damage / loss",
       "return": "Customer return"
-    }
+    },
+    "customers": "Customers",
+    "searchCustomers": "Search a customer…",
+    "vipCount": "{{count}} VIP",
+    "ordersCountCol": "Orders",
+    "totalSpent": "Total spent",
+    "lastOrder": "Last order",
+    "orderHistory": "Order history"
   },
   "common": {
     "loading": "Loading...",

@@ -59,6 +59,23 @@ export interface AdminProduct extends ProductDetail {
   is_active: boolean;
 }
 
+export interface Customer {
+  phone: string;
+  name: string;
+  wilaya: string;
+  orders: number;
+  delivered: number;
+  spent: string;
+  aov: string;
+  last_order: string | null;
+  is_vip: boolean;
+}
+
+export interface CustomersResponse {
+  vip_threshold: string;
+  customers: Customer[];
+}
+
 export type StockReason = "restock" | "correction" | "damage" | "return";
 
 export interface StockMovement {

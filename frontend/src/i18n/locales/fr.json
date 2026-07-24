@@ -232,7 +232,14 @@
       "correction": "Correction d'inventaire",
       "damage": "Casse / perte",
       "return": "Retour client"
-    }
+    },
+    "customers": "Clients",
+    "searchCustomers": "Rechercher un client…",
+    "vipCount": "{{count}} VIP",
+    "ordersCountCol": "Commandes",
+    "totalSpent": "Total dépensé",
+    "lastOrder": "Dernière commande",
+    "orderHistory": "Historique des commandes"
   },
   "common": {
     "loading": "Chargement...",

@@ -232,7 +232,14 @@
       "correction": "تصحيح الجرد",
       "damage": "تلف / خسارة",
       "return": "إرجاع عميل"
-    }
+    },
+    "customers": "العملاء",
+    "searchCustomers": "ابحث عن عميل…",
+    "vipCount": "{{count}} VIP",
+    "ordersCountCol": "الطلبات",
+    "totalSpent": "إجمالي الإنفاق",
+    "lastOrder": "آخر طلب",
+    "orderHistory": "سجل الطلبات"
   },
   "common": {
     "loading": "جارٍ التحميل...",
