@@ -149,16 +149,18 @@ class TestAdminDashboard:
         api_client.post(ORDERS_URL, order_payload(variant, wilaya, qty=2), format="json")
         api_client.post(ORDERS_URL, order_payload(variant, wilaya, qty=1), format="json")
 
-        resp = admin_client.get(self.URL)
+        resp = admin_client.get(self.URL)  # default period: this_month
         assert resp.status_code == 200, resp.data
         totals = resp.data["totals"]["current"]
         assert totals["orders"] == 2
         assert totals["revenue"] == "7500.00"
         assert totals["aov"] == "3750.00"
+        assert totals["units"] == 3
         assert resp.data["status_counts"] == {"pending": 2}
-        assert len(resp.data["series"]) == 30
-        assert resp.data["series"][-1]["revenue"] == "7500.00"
+        # Series sums to the period revenue regardless of bucket granularity.
+        assert sum(float(p["revenue"]) for p in resp.data["series"]) == 7500.0
         assert resp.data["top_products"][0]["units"] == 3
+        assert resp.data["top_products_qty"][0]["units"] == 3
         assert len(resp.data["recent_orders"]) == 2
 
     def test_cancelled_orders_excluded_from_revenue(
@@ -180,9 +182,10 @@ class TestAdminDashboard:
         resp = admin_client.get(self.URL)
         assert any(v["sku"] == "LOW-1" for v in resp.data["low_stock"])
 
-    def test_days_param_clamped(self, admin_client):
-        resp = admin_client.get(self.URL, {"days": 7})
-        assert resp.data["period_days"] == 7
-        assert len(resp.data["series"]) == 7
-        resp = admin_client.get(self.URL, {"days": "bogus"})
-        assert resp.data["period_days"] == 30
+    def test_period_presets(self, admin_client):
+        resp = admin_client.get(self.URL, {"period": "today"})
+        assert resp.data["period"]["preset"] == "today"
+        assert resp.data["period"]["granularity"] == "hour"
+        # Unknown preset falls back to this_month.
+        resp = admin_client.get(self.URL, {"period": "bogus"})
+        assert resp.data["period"]["preset"] == "this_month"

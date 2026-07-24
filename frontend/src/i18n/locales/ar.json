@@ -181,7 +181,18 @@
     "pwdChanged": "تم تحديث كلمة المرور.",
     "pwdError": "تعذّر تغيير كلمة المرور.",
     "saving": "جارٍ الحفظ…",
-    "updatePassword": "تحديث"
+    "updatePassword": "تحديث",
+    "overviewLive": "مؤشرات متجرك المباشرة",
+    "vsPrevious": "مقارنة بالسابق",
+    "allTimeRevenue": "إجمالي المبيعات",
+    "cancelRate": "نسبة الإلغاء",
+    "periodPrev": "{{value}}% الفترة السابقة",
+    "ordersLabel": "طلب",
+    "topProductsQty": "أفضل المنتجات · الكمية",
+    "unitsShort": "{{count}} و.",
+    "heatmapTitle": "أوقات ذروة الطلبات",
+    "heatmapSub": "اليوم × الساعة",
+    "dowShort": ["إثن", "ثلا", "أرب", "خمي", "جمع", "سبت", "أحد"]
   },
   "common": {
     "loading": "جارٍ التحميل...",
@@ -297,5 +308,16 @@
     "phoneTitle": "الهاتف",
     "hoursTitle": "أوقات التواصل",
     "hoursText": "السبت – الخميس، من 9 صباحًا إلى 6 مساءً. الطلب عبر الإنترنت متاح على مدار الساعة."
+  },
+  "period": {
+    "today": "اليوم",
+    "yesterday": "أمس",
+    "this_week": "هذا الأسبوع",
+    "last_week": "الأسبوع الماضي",
+    "this_month": "هذا الشهر",
+    "last_month": "الشهر الماضي",
+    "this_year": "هذه السنة",
+    "custom": "مخصّص",
+    "apply": "تطبيق"
   }
 }

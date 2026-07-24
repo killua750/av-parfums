@@ -1,11 +1,17 @@
-from datetime import timedelta
+from datetime import datetime, time, timedelta
 from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import Count, F, Sum
-from django.db.models.functions import TruncDate
+from django.db.models.functions import (
+    ExtractHour,
+    ExtractIsoWeekDay,
+    TruncDate,
+    TruncHour,
+    TruncMonth,
+)
 from django.utils import timezone
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
@@ -73,95 +79,191 @@ class AdminDashboardView(APIView):
 
     permission_classes = [IsAdmin]
 
+    PRESETS = (
+        "today",
+        "yesterday",
+        "this_week",
+        "last_week",
+        "this_month",
+        "last_month",
+        "this_year",
+        "custom",
+    )
+
+    def _resolve_period(self, now, preset, start_q, end_q):
+        """Return (start, end) datetimes for the requested preset. `end` is
+        exclusive; in-progress presets (today/this_week/...) end at `now`."""
+
+        def midnight(dt):
+            return dt.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        m = midnight(now)
+        if preset == "today":
+            return m, now
+        if preset == "yesterday":
+            return m - timedelta(days=1), m
+        if preset == "this_week":
+            return m - timedelta(days=now.weekday()), now
+        if preset == "last_week":
+            this_week = m - timedelta(days=now.weekday())
+            return this_week - timedelta(days=7), this_week
+        if preset == "this_month":
+            return m.replace(day=1), now
+        if preset == "last_month":
+            first = m.replace(day=1)
+            prev_last = first - timedelta(days=1)
+            return prev_last.replace(day=1), first
+        if preset == "this_year":
+            return m.replace(month=1, day=1), now
+        if preset == "custom":
+            try:
+                s = datetime.fromisoformat(start_q)
+                e = datetime.fromisoformat(end_q)
+                tz = timezone.get_current_timezone()
+                s = timezone.make_aware(datetime.combine(s.date(), time.min), tz)
+                e = timezone.make_aware(datetime.combine(e.date(), time.min), tz) + timedelta(
+                    days=1
+                )
+                return s, e
+            except (TypeError, ValueError):
+                pass
+        return m.replace(day=1), now
+
     def get(self, request):
-        try:
-            days = int(request.query_params.get("days", 30))
-        except (TypeError, ValueError):
-            days = 30
-        days = max(1, min(days, 365))
+        preset = request.query_params.get("period", "this_month")
+        if preset not in self.PRESETS:
+            preset = "this_month"
 
         now = timezone.now()
-        start = now - timedelta(days=days)
-        prev_start = start - timedelta(days=days)
+        start, end = self._resolve_period(
+            now, preset, request.query_params.get("start"), request.query_params.get("end")
+        )
+        span = end - start
+        prev_start, prev_end = start - span, start
 
-        active = Order.objects.exclude(status=OrderStatus.CANCELLED)
-        current = active.filter(created_at__gte=start)
-        previous = active.filter(created_at__gte=prev_start, created_at__lt=start)
+        span_days = span.total_seconds() / 86400
+        granularity = "hour" if span_days <= 2 else "day" if span_days <= 92 else "month"
 
         cents = Decimal("0.01")
+        active = Order.objects.exclude(status=OrderStatus.CANCELLED)
+        current = active.filter(created_at__gte=start, created_at__lt=end)
+        previous = active.filter(created_at__gte=prev_start, created_at__lt=prev_end)
 
-        def window_totals(qs) -> dict:
+        def window_totals(qs):
             agg = qs.aggregate(revenue=Sum("total"), orders=Count("id"))
-            revenue: Decimal = (agg["revenue"] or Decimal("0")).quantize(cents)
-            orders: int = agg["orders"] or 0
+            revenue = (agg["revenue"] or Decimal("0")).quantize(cents)
+            orders = agg["orders"] or 0
+            units = qs.aggregate(u=Sum("items__quantity"))["u"] or 0
             aov = (revenue / orders).quantize(cents) if orders else Decimal("0.00")
-            return {"revenue": str(revenue), "orders": orders, "aov": str(aov)}
+            return {"revenue": str(revenue), "orders": orders, "units": units, "aov": str(aov)}
 
-        user_model = get_user_model()
-        customers = user_model.objects.filter(is_active=True)
+        def cancel_rate(s, e):
+            qs = Order.objects.filter(created_at__gte=s, created_at__lt=e)
+            total = qs.count()
+            if not total:
+                return 0.0
+            return round(qs.filter(status=OrderStatus.CANCELLED).count() / total * 100, 1)
 
-        # Daily revenue/order series with zero-filled gaps for the chart.
-        rows = {
-            row["day"]: row
-            for row in current.annotate(day=TruncDate("created_at"))
-            .values("day")
+        trunc = {"hour": TruncHour, "day": TruncDate, "month": TruncMonth}[granularity]
+        grouped = {}
+        for row in (
+            current.annotate(b=trunc("created_at"))
+            .values("b")
             .annotate(revenue=Sum("total"), orders=Count("id"))
-        }
+        ):
+            b = row["b"]
+            if granularity == "hour":
+                key = timezone.localtime(b).strftime("%Y-%m-%dT%H")
+            elif granularity == "month":
+                key = b.strftime("%Y-%m")
+            else:
+                key = b.isoformat()
+            grouped[key] = row
+
         series = []
-        for offset in range(days - 1, -1, -1):
-            day = (now - timedelta(days=offset)).date()
-            row = rows.get(day)
+        cursor = timezone.localtime(start) if granularity == "hour" else start
+        guard = 0
+        while cursor < end and guard < 1000:
+            guard += 1
+            if granularity == "hour":
+                key = cursor.strftime("%Y-%m-%dT%H")
+                iso = cursor.isoformat()
+                nxt = cursor + timedelta(hours=1)
+            elif granularity == "month":
+                key = cursor.strftime("%Y-%m")
+                iso = cursor.date().replace(day=1).isoformat()
+                nxt = (cursor.replace(day=1) + timedelta(days=32)).replace(day=1)
+            else:
+                key = cursor.date().isoformat()
+                iso = key
+                nxt = cursor + timedelta(days=1)
+            row = grouped.get(key)
             series.append(
                 {
-                    "date": day.isoformat(),
+                    "bucket": iso,
                     "revenue": str((row["revenue"] if row else Decimal("0")).quantize(cents)),
                     "orders": row["orders"] if row else 0,
                 }
             )
+            cursor = nxt
 
         status_counts = {
             row["status"]: row["n"]
-            for row in Order.objects.filter(created_at__gte=start)
+            for row in Order.objects.filter(created_at__gte=start, created_at__lt=end)
             .values("status")
             .annotate(n=Count("id"))
         }
 
-        top_products = [
-            {
-                "name": row["product_name"],
-                "units": row["units"],
-                "revenue": str((row["revenue"] or Decimal("0")).quantize(cents)),
-            }
-            for row in OrderItem.objects.filter(
-                order__created_at__gte=start,
-            )
-            .exclude(order__status=OrderStatus.CANCELLED)
-            .values("product_name")
-            .annotate(units=Sum("quantity"), revenue=Sum(F("unit_price") * F("quantity")))
-            .order_by("-revenue")[:6]
-        ]
+        item_qs = OrderItem.objects.filter(
+            order__created_at__gte=start, order__created_at__lt=end
+        ).exclude(order__status=OrderStatus.CANCELLED)
 
-        # Revenue by delivery wilaya (period, cancelled excluded) — shows where
-        # demand concentrates geographically.
+        def products_by(order_field):
+            return [
+                {
+                    "name": r["product_name"],
+                    "units": r["units"],
+                    "revenue": str((r["revenue"] or Decimal("0")).quantize(cents)),
+                }
+                for r in item_qs.values("product_name")
+                .annotate(units=Sum("quantity"), revenue=Sum(F("unit_price") * F("quantity")))
+                .order_by(order_field)[:8]
+            ]
+
+        top_products = products_by("-revenue")
+        top_products_qty = products_by("-units")
+
         top_wilayas = [
             {
-                "name": row["shipping_address__wilaya__name"],
-                "orders": row["orders"],
-                "revenue": str((row["revenue"] or Decimal("0")).quantize(cents)),
+                "name": r["shipping_address__wilaya__name"],
+                "orders": r["orders"],
+                "revenue": str((r["revenue"] or Decimal("0")).quantize(cents)),
             }
-            for row in current.filter(shipping_address__isnull=False)
+            for r in current.filter(shipping_address__isnull=False)
             .values("shipping_address__wilaya__name")
             .annotate(orders=Count("id"), revenue=Sum("total"))
-            .order_by("-revenue")[:6]
+            .order_by("-revenue")[:10]
         ]
 
+        heatmap = [
+            {"dow": r["dow"], "hour": r["hour"], "count": r["n"]}
+            for r in current.annotate(
+                dow=ExtractIsoWeekDay("created_at"), hour=ExtractHour("created_at")
+            )
+            .values("dow", "hour")
+            .annotate(n=Count("id"))
+        ]
+
+        user_model = get_user_model()
+        customers = user_model.objects.filter(is_active=True)
+        buyer_counts = list(
+            active.filter(user__isnull=False).values("user").annotate(n=Count("id"))
+        )
+        buyers = len(buyer_counts)
+        repeat = sum(1 for b in buyer_counts if b["n"] > 1)
+
         low_stock = [
-            {
-                "product": v.product.name,
-                "size": v.size,
-                "sku": v.sku,
-                "stock": v.stock,
-            }
+            {"product": v.product.name, "size": v.size, "sku": v.sku, "stock": v.stock}
             for v in ProductVariant.objects.select_related("product")
             .filter(stock__lte=settings.LOW_STOCK_THRESHOLD)
             .order_by("stock")[:8]
@@ -173,9 +275,7 @@ class AdminDashboardView(APIView):
                 "created_at": o.created_at.isoformat(),
                 "status": o.status,
                 "total": str(o.total),
-                "customer": (
-                    o.shipping_address.full_name if hasattr(o, "shipping_address") else ""
-                ),
+                "customer": o.shipping_address.full_name if hasattr(o, "shipping_address") else "",
                 "items_count": sum(i.quantity for i in o.items.all()),
             }
             for o in Order.objects.prefetch_related("items")
@@ -185,23 +285,38 @@ class AdminDashboardView(APIView):
 
         return Response(
             {
-                "period_days": days,
+                "period": {
+                    "preset": preset,
+                    "start": start.isoformat(),
+                    "end": end.isoformat(),
+                    "granularity": granularity,
+                },
                 "totals": {
                     "current": window_totals(current),
                     "previous": window_totals(previous),
+                    "revenue_all_time": str(
+                        (active.aggregate(r=Sum("total"))["r"] or Decimal("0")).quantize(cents)
+                    ),
                     "customers": customers.count(),
-                    "new_customers": customers.filter(date_joined__gte=start).count(),
-                    "new_customers_prev": customers.filter(
-                        date_joined__gte=prev_start, date_joined__lt=start
+                    "new_customers": customers.filter(
+                        date_joined__gte=start, date_joined__lt=end
                     ).count(),
+                    "new_customers_prev": customers.filter(
+                        date_joined__gte=prev_start, date_joined__lt=prev_end
+                    ).count(),
+                    "recurring_rate": round(repeat / buyers * 100, 1) if buyers else 0.0,
                     "open_orders": Order.objects.filter(
                         status__in=[OrderStatus.PENDING, OrderStatus.CONFIRMED]
                     ).count(),
+                    "cancel_rate": cancel_rate(start, end),
+                    "cancel_rate_prev": cancel_rate(prev_start, prev_end),
                 },
                 "series": series,
                 "status_counts": status_counts,
                 "top_products": top_products,
+                "top_products_qty": top_products_qty,
                 "top_wilayas": top_wilayas,
+                "heatmap": heatmap,
                 "low_stock": low_stock,
                 "recent_orders": recent_orders,
             }

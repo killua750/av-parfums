@@ -181,7 +181,18 @@
     "pwdChanged": "Mot de passe mis à jour.",
     "pwdError": "Impossible de changer le mot de passe.",
     "saving": "Enregistrement…",
-    "updatePassword": "Mettre à jour"
+    "updatePassword": "Mettre à jour",
+    "overviewLive": "Vos indicateurs en temps réel",
+    "vsPrevious": "vs période préc.",
+    "allTimeRevenue": "CA total",
+    "cancelRate": "Taux d'annulation",
+    "periodPrev": "{{value}}% période préc.",
+    "ordersLabel": "commandes",
+    "topProductsQty": "Top produits · quantité",
+    "unitsShort": "{{count}} u.",
+    "heatmapTitle": "Pics de commandes",
+    "heatmapSub": "Jour × heure",
+    "dowShort": ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]
   },
   "common": {
     "loading": "Chargement...",
@@ -297,5 +308,16 @@
     "phoneTitle": "Téléphone",
     "hoursTitle": "Disponibilité",
     "hoursText": "Samedi – jeudi, 9h à 18h. Les commandes en ligne restent ouvertes 24h/24."
+  },
+  "period": {
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "this_week": "Cette semaine",
+    "last_week": "Semaine dernière",
+    "this_month": "Ce mois",
+    "last_month": "Mois dernier",
+    "this_year": "Cette année",
+    "custom": "Personnalisé",
+    "apply": "Appliquer"
   }
 }

@@ -181,7 +181,18 @@
     "pwdChanged": "Password updated.",
     "pwdError": "Could not change the password.",
     "saving": "Saving…",
-    "updatePassword": "Update"
+    "updatePassword": "Update",
+    "overviewLive": "Your live business metrics",
+    "vsPrevious": "vs prev.",
+    "allTimeRevenue": "Total revenue",
+    "cancelRate": "Cancellation rate",
+    "periodPrev": "{{value}}% prev period",
+    "ordersLabel": "orders",
+    "topProductsQty": "Top products · quantity",
+    "unitsShort": "{{count}} u.",
+    "heatmapTitle": "Order peaks",
+    "heatmapSub": "Day × hour",
+    "dowShort": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
   },
   "common": {
     "loading": "Loading...",
@@ -297,5 +308,16 @@
     "phoneTitle": "Phone",
     "hoursTitle": "Availability",
     "hoursText": "Saturday – Thursday, 9am to 6pm. Online ordering stays open 24/7."
+  },
+  "period": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "this_week": "This week",
+    "last_week": "Last week",
+    "this_month": "This month",
+    "last_month": "Last month",
+    "this_year": "This year",
+    "custom": "Custom",
+    "apply": "Apply"
   }
 }

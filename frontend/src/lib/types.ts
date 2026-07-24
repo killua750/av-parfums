@@ -48,26 +48,50 @@ export interface ProductDetail extends Product {
   variants: ProductVariant[];
 }
 
+export type PeriodPreset =
+  | "today"
+  | "yesterday"
+  | "this_week"
+  | "last_week"
+  | "this_month"
+  | "last_month"
+  | "this_year"
+  | "custom";
+
+export type Granularity = "hour" | "day" | "month";
+
 export interface DashboardWindow {
   revenue: string;
   orders: number;
+  units: number;
   aov: string;
 }
 
 export interface DashboardData {
-  period_days: number;
+  period: {
+    preset: PeriodPreset;
+    start: string;
+    end: string;
+    granularity: Granularity;
+  };
   totals: {
     current: DashboardWindow;
     previous: DashboardWindow;
+    revenue_all_time: string;
     customers: number;
     new_customers: number;
     new_customers_prev: number;
+    recurring_rate: number;
     open_orders: number;
+    cancel_rate: number;
+    cancel_rate_prev: number;
   };
-  series: { date: string; revenue: string; orders: number }[];
+  series: { bucket: string; revenue: string; orders: number }[];
   status_counts: Partial<Record<OrderStatus, number>>;
   top_products: { name: string; units: number; revenue: string }[];
+  top_products_qty: { name: string; units: number; revenue: string }[];
   top_wilayas: { name: string; orders: number; revenue: string }[];
+  heatmap: { dow: number; hour: number; count: number }[];
   low_stock: { product: string; size: string; sku: string; stock: number }[];
   recent_orders: {
     number: string;

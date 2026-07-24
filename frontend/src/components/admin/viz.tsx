@@ -20,6 +20,21 @@ export const VIZ = {
   critical: "#d03b3b",
 } as const;
 
+// The admin panel's own brand accent (violet-rose) — deliberately NOT one of
+// the product-line colors, so the dashboard reads as the store's control
+// center rather than a single fragrance. Used for primary charts & actions.
+export const BRAND = {
+  accent: "#a855f7",
+  accentSoft: "#c084fc",
+  gradFrom: "#a855f7",
+  gradTo: "#db2777",
+} as const;
+
+// Category/product series echo the five product lines (Sweet Dreams rose,
+// Honey Touch amber, Dziria gold, Afro Passion turquoise, Eau de Cologne
+// lavender) so each is recognisable and consistent with the public site.
+export const PRODUCT_HUES = ["#E88BB0", "#D9A25A", "#C9873E", "#2FA69A", "#8B7EC8"] as const;
+
 /* ---------------------------------- Stat tile --------------------------------- */
 
 export function StatTile({

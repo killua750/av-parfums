@@ -1,6 +1,6 @@
-// Back-office overview: KPI tiles with sparklines + period-over-period deltas,
-// a secondary metrics strip, revenue trend, order pipeline, top products,
-// low-stock alerts and latest orders.
+// Back-office overview: period-filtered KPIs with vs-previous comparison,
+// revenue trend, status donut, top products / wilayas, an orders heatmap,
+// low-stock alerts and latest orders. Every figure respects the period filter.
 import { useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -13,11 +13,13 @@ import {
   Receipt,
   ShoppingBag,
   UserPlus,
-  Users,
+  Wallet,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { AreaChart, BarList, Panel, StatTile, VIZ } from "@/components/admin/viz";
+import { OrdersHeatmap, RankBars, RevenueArea, StatusDonut } from "@/components/admin/charts";
+import { PeriodFilter, type PeriodValue } from "@/components/admin/PeriodFilter";
+import { Panel, StatTile, VIZ } from "@/components/admin/viz";
 import { api } from "@/lib/api";
 import { formatDA, formatDACompact, pctDelta } from "@/lib/format";
 import type { DashboardData, OrderStatus } from "@/lib/types";
@@ -34,49 +36,37 @@ const STATUS_COLORS: Record<OrderStatus, string> = {
   delivered: "#22c55e",
   cancelled: "#ef4444",
 };
-
 const STATUS_ORDER: OrderStatus[] = ["pending", "confirmed", "shipped", "delivered", "cancelled"];
-const PERIODS = [7, 30, 90] as const;
 
 function AdminOverview() {
   const { t, i18n } = useTranslation();
-  const [days, setDays] = useState<(typeof PERIODS)[number]>(30);
+  const [period, setPeriod] = useState<PeriodValue>({ preset: "this_month" });
+
+  const params = new URLSearchParams({ period: period.preset });
+  if (period.preset === "custom" && period.start && period.end) {
+    params.set("start", period.start);
+    params.set("end", period.end);
+  }
 
   const { data, isPending } = useQuery<DashboardData>({
-    queryKey: ["admin", "dashboard", days],
-    queryFn: () => api<DashboardData>(`/api/v1/admin/dashboard/?days=${days}`),
+    queryKey: ["admin", "dashboard", period],
+    queryFn: () => api<DashboardData>(`/api/v1/admin/dashboard/?${params.toString()}`),
     placeholderData: (prev) => prev,
   });
 
-  if (isPending || !data) {
-    return (
-      <div className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-32 rounded-2xl skeleton" />
-          ))}
-        </div>
-        <div className="h-20 rounded-2xl skeleton" />
-        <div className="h-80 rounded-2xl skeleton" />
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className="h-64 rounded-2xl skeleton" />
-          <div className="h-64 rounded-2xl skeleton" />
-        </div>
-      </div>
-    );
-  }
+  if (isPending || !data) return <DashboardSkeleton />;
 
   const { current, previous } = data.totals;
-  const vsPrev = t("admin.vsPrev", { days });
+  const vsPrev = t("admin.vsPrevious");
   const dateLocale = i18n.language === "ar" ? "ar-DZ" : i18n.language === "en" ? "en" : "fr";
+  const dowLabels = t("admin.dowShort", { returnObjects: true }) as string[];
 
-  const revSpark = data.series.map((s) => parseFloat(s.revenue));
-  const ordSpark = data.series.map((s) => s.orders);
-  const periodTotal = STATUS_ORDER.reduce((sum, s) => sum + (data.status_counts[s] ?? 0), 0);
-  const deliveredRate = periodTotal
-    ? Math.round(((data.status_counts.delivered ?? 0) / periodTotal) * 100)
-    : 0;
-  const itemsSold = data.top_products.reduce((sum, p) => sum + p.units, 0);
+  const seriesNum = data.series.map((s) => ({
+    bucket: s.bucket,
+    revenue: parseFloat(s.revenue),
+    orders: s.orders,
+  }));
+  const periodTotal = STATUS_ORDER.reduce((n, s) => n + (data.status_counts[s] ?? 0), 0);
 
   return (
     <div className="space-y-4">
@@ -87,25 +77,13 @@ function AdminOverview() {
             {t("admin.overview")}
           </h1>
           <p className="mt-1 text-sm" style={{ color: VIZ.muted }}>
-            {t("admin.overviewSub", { days })}
+            {t("admin.overviewLive")}
           </p>
         </div>
-        <div className="flex rounded-full border border-white/15 p-1">
-          {PERIODS.map((p) => (
-            <button
-              key={p}
-              onClick={() => setDays(p)}
-              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
-                days === p ? "bg-white text-black" : "text-white/60 hover:text-white"
-              }`}
-            >
-              {t("admin.lastDays", { days: p })}
-            </button>
-          ))}
-        </div>
+        <PeriodFilter value={period} onChange={setPeriod} />
       </div>
 
-      {/* KPI tiles */}
+      {/* Primary KPIs */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
           label={t("admin.revenue")}
@@ -113,8 +91,7 @@ function AdminOverview() {
           delta={pctDelta(parseFloat(current.revenue), parseFloat(previous.revenue))}
           deltaLabel={vsPrev}
           icon={<Banknote size={16} />}
-          spark={revSpark}
-          accent={VIZ.blue}
+          spark={seriesNum.map((s) => s.revenue)}
         />
         <StatTile
           label={t("admin.orders")}
@@ -122,8 +99,7 @@ function AdminOverview() {
           delta={pctDelta(current.orders, previous.orders)}
           deltaLabel={vsPrev}
           icon={<ShoppingBag size={16} />}
-          spark={ordSpark}
-          accent={VIZ.aqua}
+          spark={seriesNum.map((s) => s.orders)}
         />
         <StatTile
           label={t("admin.avgOrder")}
@@ -133,16 +109,22 @@ function AdminOverview() {
           icon={<Receipt size={16} />}
         />
         <StatTile
-          label={t("admin.newCustomers")}
-          value={String(data.totals.new_customers)}
-          delta={pctDelta(data.totals.new_customers, data.totals.new_customers_prev)}
+          label={t("admin.itemsSold")}
+          value={String(current.units)}
+          delta={pctDelta(current.units, previous.units)}
           deltaLabel={vsPrev}
-          icon={<UserPlus size={16} />}
+          icon={<Package size={16} />}
         />
       </div>
 
-      {/* Secondary metrics strip */}
+      {/* Secondary metrics */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <MiniStat
+          icon={<Wallet size={16} />}
+          label={t("admin.allTimeRevenue")}
+          value={formatDACompact(data.totals.revenue_all_time)}
+          hint={t("admin.allTime")}
+        />
         <MiniStat
           icon={<Clock size={16} />}
           label={t("admin.openOrders")}
@@ -151,22 +133,16 @@ function AdminOverview() {
           highlight={data.totals.open_orders > 0}
         />
         <MiniStat
-          icon={<CheckCircle2 size={16} />}
-          label={t("admin.deliveredRate")}
-          value={`${deliveredRate}%`}
-          hint={t("admin.thisPeriod")}
+          icon={<AlertTriangle size={16} />}
+          label={t("admin.cancelRate")}
+          value={`${data.totals.cancel_rate}%`}
+          hint={t("admin.periodPrev", { value: data.totals.cancel_rate_prev })}
         />
         <MiniStat
-          icon={<Package size={16} />}
-          label={t("admin.itemsSold")}
-          value={String(itemsSold)}
+          icon={<UserPlus size={16} />}
+          label={t("admin.newCustomers")}
+          value={String(data.totals.new_customers)}
           hint={t("admin.thisPeriod")}
-        />
-        <MiniStat
-          icon={<Users size={16} />}
-          label={t("admin.totalCustomers")}
-          value={String(data.totals.customers)}
-          hint={t("admin.allTime")}
         />
       </div>
 
@@ -179,82 +155,104 @@ function AdminOverview() {
           </span>
         }
       >
-        <AreaChart
-          points={data.series.map((s) => ({
-            date: s.date,
-            value: parseFloat(s.revenue),
-            detail: t("admin.ordersCount", { count: s.orders }),
-          }))}
-          formatValue={formatDA}
-          locale={dateLocale}
-          height={260}
-        />
+        {periodTotal === 0 ? (
+          <Empty text={t("admin.noData")} />
+        ) : (
+          <RevenueArea
+            data={seriesNum}
+            granularity={data.period.granularity}
+            locale={dateLocale}
+            formatValue={formatDA}
+          />
+        )}
       </Panel>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {/* Order pipeline */}
+        {/* Status donut */}
         <Panel title={t("admin.statusBreakdown")}>
-          {/* Status-share bar: one segment per status, 2px surface gaps. */}
-          {periodTotal > 0 && (
-            <div className="mb-4 flex h-2.5 gap-[2px] overflow-hidden rounded-full">
-              {STATUS_ORDER.filter((s) => data.status_counts[s]).map((s) => (
-                <span
-                  key={s}
-                  title={`${t(`order.status.${s}`)}: ${data.status_counts[s]}`}
-                  style={{
-                    width: `${((data.status_counts[s] ?? 0) / periodTotal) * 100}%`,
-                    backgroundColor: STATUS_COLORS[s],
-                  }}
-                />
-              ))}
-            </div>
+          {periodTotal === 0 ? (
+            <Empty text={t("admin.noData")} />
+          ) : (
+            <StatusDonut
+              total={periodTotal}
+              centerLabel={t("admin.ordersLabel")}
+              data={STATUS_ORDER.filter((s) => data.status_counts[s]).map((s) => ({
+                key: s,
+                label: t(`order.status.${s}`),
+                value: data.status_counts[s] ?? 0,
+                color: STATUS_COLORS[s],
+              }))}
+            />
           )}
-          <BarList
-            emptyText={t("admin.noData")}
-            items={STATUS_ORDER.filter((s) => data.status_counts[s]).map((s) => ({
-              key: s,
-              label: (
-                <span className="inline-flex items-center gap-2">
-                  <span
-                    className="h-2 w-2 rounded-full"
-                    style={{ backgroundColor: STATUS_COLORS[s] }}
-                  />
-                  {t(`order.status.${s}`)}
-                </span>
-              ),
-              value: data.status_counts[s] ?? 0,
-              display: String(data.status_counts[s] ?? 0),
-            }))}
-          />
         </Panel>
 
-        {/* Top products */}
+        {/* Top products by revenue */}
         <Panel title={t("admin.topProducts")}>
-          <BarList
-            color={VIZ.aqua}
-            emptyText={t("admin.noData")}
-            items={data.top_products.map((p) => ({
-              key: p.name,
-              label: `${p.name} · ${t("admin.unitsSold", { count: p.units })}`,
-              value: parseFloat(p.revenue),
-              display: formatDACompact(p.revenue),
-            }))}
-          />
+          {data.top_products.length === 0 ? (
+            <Empty text={t("admin.noData")} />
+          ) : (
+            <RankBars
+              palette="product"
+              formatValue={formatDA}
+              items={data.top_products.map((p) => ({
+                name: p.name,
+                value: parseFloat(p.revenue),
+                sub: t("admin.unitsSold", { count: p.units }),
+              }))}
+            />
+          )}
         </Panel>
       </div>
 
-      {/* Sales by wilaya */}
-      <Panel title={t("admin.topWilayas")}>
-        <BarList
-          color={VIZ.blue}
-          emptyText={t("admin.noData")}
-          items={data.top_wilayas.map((w) => ({
-            key: w.name,
-            label: `${w.name} · ${t("admin.ordersCount", { count: w.orders })}`,
-            value: parseFloat(w.revenue),
-            display: formatDACompact(w.revenue),
-          }))}
-        />
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Sales by wilaya */}
+        <Panel title={t("admin.topWilayas")}>
+          {data.top_wilayas.length === 0 ? (
+            <Empty text={t("admin.noData")} />
+          ) : (
+            <RankBars
+              formatValue={formatDA}
+              items={data.top_wilayas.map((w) => ({
+                name: w.name,
+                value: parseFloat(w.revenue),
+                sub: t("admin.ordersCount", { count: w.orders }),
+              }))}
+            />
+          )}
+        </Panel>
+
+        {/* Top products by quantity */}
+        <Panel title={t("admin.topProductsQty")}>
+          {data.top_products_qty.length === 0 ? (
+            <Empty text={t("admin.noData")} />
+          ) : (
+            <RankBars
+              palette="product"
+              formatValue={(v) => t("admin.unitsShort", { count: v })}
+              items={data.top_products_qty.map((p) => ({
+                name: p.name,
+                value: p.units,
+                sub: formatDACompact(p.revenue),
+              }))}
+            />
+          )}
+        </Panel>
+      </div>
+
+      {/* Heatmap */}
+      <Panel
+        title={t("admin.heatmapTitle")}
+        action={
+          <span className="text-xs" style={{ color: VIZ.muted }}>
+            {t("admin.heatmapSub")}
+          </span>
+        }
+      >
+        {data.heatmap.length === 0 ? (
+          <Empty text={t("admin.noData")} />
+        ) : (
+          <OrdersHeatmap cells={data.heatmap} dowLabels={dowLabels} />
+        )}
       </Panel>
 
       <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
@@ -311,9 +309,7 @@ function AdminOverview() {
           }
         >
           {data.recent_orders.length === 0 ? (
-            <p className="py-8 text-center text-sm" style={{ color: VIZ.muted }}>
-              {t("admin.noData")}
-            </p>
+            <Empty text={t("admin.noData")} />
           ) : (
             <ul className="divide-y divide-white/5">
               {data.recent_orders.map((o) => (
@@ -363,6 +359,14 @@ function AdminOverview() {
   );
 }
 
+function Empty({ text }: { text: string }) {
+  return (
+    <p className="py-10 text-center text-sm" style={{ color: VIZ.muted }}>
+      {text}
+    </p>
+  );
+}
+
 function MiniStat({
   icon,
   label,
@@ -392,6 +396,24 @@ function MiniStat({
       <p className="mt-0.5 text-[11px]" style={{ color: VIZ.muted }}>
         {hint}
       </p>
+    </div>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-32 rounded-2xl skeleton" />
+        ))}
+      </div>
+      <div className="h-20 rounded-2xl skeleton" />
+      <div className="h-80 rounded-2xl skeleton" />
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="h-64 rounded-2xl skeleton" />
+        <div className="h-64 rounded-2xl skeleton" />
+      </div>
     </div>
   );
 }
