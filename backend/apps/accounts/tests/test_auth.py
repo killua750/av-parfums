@@ -88,3 +88,55 @@ class TestLogout:
         assert resp.cookies["av-access"].value == ""
         assert resp.cookies["av-refresh"].value == ""
         assert api_client.get(ME_URL).status_code in (401, 403)
+
+
+class TestPasswordChange:
+    URL = reverse("auth-password-change")
+
+    def test_requires_correct_old_password(self, auth_client, user):
+        # Wrong current password must be rejected (OLD_PASSWORD_FIELD_ENABLED).
+        resp = auth_client.post(
+            self.URL,
+            {
+                "old_password": "totally-wrong",
+                "new_password1": "N3wStrongPass!9",
+                "new_password2": "N3wStrongPass!9",
+            },
+        )
+        assert resp.status_code == 400
+        assert "old_password" in resp.data
+
+    def test_changes_with_correct_old_password(self, auth_client, api_client, user):
+        resp = auth_client.post(
+            self.URL,
+            {
+                "old_password": "S3curePass!42",
+                "new_password1": "N3wStrongPass!9",
+                "new_password2": "N3wStrongPass!9",
+            },
+        )
+        assert resp.status_code == 200, resp.data
+        # New password now works, old one no longer does.
+        assert (
+            api_client.post(
+                LOGIN_URL, {"email": user.email, "password": "N3wStrongPass!9"}
+            ).status_code
+            == 200
+        )
+        assert (
+            api_client.post(
+                LOGIN_URL, {"email": user.email, "password": "S3curePass!42"}
+            ).status_code
+            == 400
+        )
+
+    def test_requires_authentication(self, api_client):
+        resp = api_client.post(
+            self.URL,
+            {
+                "old_password": "x",
+                "new_password1": "N3wStrongPass!9",
+                "new_password2": "N3wStrongPass!9",
+            },
+        )
+        assert resp.status_code in (401, 403)

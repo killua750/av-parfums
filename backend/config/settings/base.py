@@ -190,6 +190,9 @@ REST_AUTH = {
     "USER_DETAILS_SERIALIZER": "apps.accounts.serializers.UserSerializer",
     "REGISTER_SERIALIZER": "apps.accounts.serializers.RegisterSerializer",
     "SESSION_LOGIN": False,
+    # Password change must verify the current password (off by default in
+    # dj-rest-auth, which would let an authenticated user reset it blindly).
+    "OLD_PASSWORD_FIELD_ENABLED": True,
 }
 
 SIMPLE_JWT = {
