@@ -26,7 +26,8 @@
     "close": "Fermer",
     "decrease": "Diminuer",
     "increase": "Augmenter",
-    "added": "Ajouté au panier"
+    "added": "Ajouté au panier",
+    "add": "Ajouter"
   },
   "checkout": {
     "title": "Paiement à la livraison",
@@ -151,7 +152,19 @@
     "size": "Taille",
     "chooseImage": "Choisir une image",
     "items": "Articles",
-    "orderNumber": "Commande"
+    "orderNumber": "Commande",
+    "menu": "Menu",
+    "admin": "Admin",
+    "overviewSub": "Performance des {{days}} derniers jours",
+    "openOrders": "Commandes ouvertes",
+    "needsAction": "À traiter",
+    "deliveredRate": "Taux de livraison",
+    "thisPeriod": "Sur la période",
+    "itemsSold": "Articles vendus",
+    "totalCustomers": "Clients",
+    "allTime": "Depuis le début",
+    "stockHealthyHint": "Aucun réapprovisionnement nécessaire pour l'instant.",
+    "itemsCount": "{{count}} article(s)"
   },
   "common": {
     "loading": "Chargement...",
@@ -174,7 +187,65 @@
     "storyText": "AV Parfums est né d'une conviction simple : chacune mérite un sillage qui lui ressemble. Nos brumes parfumées capturent des instants — la douceur d'un rêve sucré, la chaleur dorée du miel — dans des formules généreuses de 200 ml.",
     "storyCta": "Découvrir la marque",
     "ctaTitle": "Prête à trouver votre signature ?",
-    "ctaButton": "Explorer la boutique"
+    "ctaButton": "Explorer la boutique",
+    "howEyebrow": "Simple & sans risque",
+    "howTitle": "Comment ça marche",
+    "how1Title": "Choisissez",
+    "how1Text": "Parcourez la collection et ajoutez vos brumes préférées au panier.",
+    "how2Title": "Commandez",
+    "how2Text": "Validez en quelques secondes — aucun compte ni paiement en ligne requis.",
+    "how3Title": "Confirmation",
+    "how3Text": "Notre équipe vous appelle pour confirmer la commande et l'adresse.",
+    "how4Title": "Payez à la livraison",
+    "how4Text": "Recevez votre colis partout en Algérie et réglez en espèces.",
+    "statFragrances": "Fragrances",
+    "statWilayas": "Wilayas livrées",
+    "statVolume": "Format généreux",
+    "statCod": "Paiement à la livraison",
+    "reviewsEyebrow": "Elles nous font confiance",
+    "reviewsTitle": "Ce que disent nos clientes",
+    "faqEyebrow": "Bon à savoir",
+    "faqTitle": "Questions fréquentes",
+    "ctaText": "Livraison dans les 58 wilayas, paiement à la livraison. Trouvez la brume qui vous ressemble.",
+    "testimonials": [
+      {
+        "name": "Amina B.",
+        "wilaya": "Alger",
+        "text": "Le sillage tient toute la journée et le flacon est magnifique. Livrée en 48h, payée à la réception. Je recommande les yeux fermés."
+      },
+      {
+        "name": "Yasmine K.",
+        "wilaya": "Oran",
+        "text": "J'ai pris Sweet Dreams et Honey Touch, les deux sentent divinement bon. Service client au top, ils m'ont appelée pour confirmer."
+      },
+      {
+        "name": "Lina M.",
+        "wilaya": "Constantine",
+        "text": "Enfin des brumes de qualité livrées jusqu'à chez moi. Paiement à la livraison, zéro stress. Je repasserai commande."
+      }
+    ],
+    "faqs": [
+      {
+        "q": "Comment se passe le paiement ?",
+        "a": "Vous payez en espèces à la réception de votre colis (paiement à la livraison). Aucun paiement en ligne n'est nécessaire."
+      },
+      {
+        "q": "Livrez-vous dans toute l'Algérie ?",
+        "a": "Oui, nous livrons dans les 58 wilayas, à domicile ou en point relais selon votre choix."
+      },
+      {
+        "q": "En combien de temps suis-je livré ?",
+        "a": "En général sous 2 à 5 jours ouvrables selon votre wilaya. Notre équipe vous appelle pour confirmer avant l'expédition."
+      },
+      {
+        "q": "Quel est le format des brumes ?",
+        "a": "Toutes nos brumes parfumées sont en format généreux de 200 ml, pour un usage quotidien qui dure."
+      },
+      {
+        "q": "Puis-je commander sans créer de compte ?",
+        "a": "Oui. Vous pouvez commander en tant qu'invité — un compte vous permet simplement de suivre vos commandes plus facilement."
+      }
+    ]
   },
   "footer": {
     "tagline": "Brumes parfumées de luxe, pensées en Algérie pour sublimer chaque instant.",

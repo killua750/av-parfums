@@ -1,5 +1,11 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { createRootRouteWithContext, HeadContent, Link, Outlet } from "@tanstack/react-router";
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Link,
+  Outlet,
+  useRouterState,
+} from "@tanstack/react-router";
 import { Toaster } from "sonner";
 
 import CartDrawer from "@/components/CartDrawer";
@@ -32,13 +38,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootComponent() {
+  // The back office has its own chrome — no storefront nav, footer or cart.
+  const isAdmin = useRouterState({ select: (s) => s.location.pathname.startsWith("/admin") });
   return (
     <>
       <HeadContent />
-      <Navbar />
+      {!isAdmin && <Navbar />}
       <Outlet />
-      <Footer />
-      <CartDrawer />
+      {!isAdmin && <Footer />}
+      {!isAdmin && <CartDrawer />}
       <Toaster richColors position="top-center" />
     </>
   );

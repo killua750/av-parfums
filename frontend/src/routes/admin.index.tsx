@@ -1,9 +1,20 @@
-// Back-office overview: KPI tiles with period-over-period deltas, revenue
-// trend, order pipeline, top products, low-stock alerts and latest orders.
-import { useState } from "react";
+// Back-office overview: KPI tiles with sparklines + period-over-period deltas,
+// a secondary metrics strip, revenue trend, order pipeline, top products,
+// low-stock alerts and latest orders.
+import { useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle } from "lucide-react";
+import {
+  AlertTriangle,
+  Banknote,
+  CheckCircle2,
+  Clock,
+  Package,
+  Receipt,
+  ShoppingBag,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { AreaChart, BarList, Panel, StatTile, VIZ } from "@/components/admin/viz";
@@ -42,9 +53,10 @@ function AdminOverview() {
       <div className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-28 rounded-2xl skeleton" />
+            <div key={i} className="h-32 rounded-2xl skeleton" />
           ))}
         </div>
+        <div className="h-20 rounded-2xl skeleton" />
         <div className="h-80 rounded-2xl skeleton" />
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="h-64 rounded-2xl skeleton" />
@@ -58,13 +70,26 @@ function AdminOverview() {
   const vsPrev = t("admin.vsPrev", { days });
   const dateLocale = i18n.language === "ar" ? "ar-DZ" : i18n.language === "en" ? "en" : "fr";
 
+  const revSpark = data.series.map((s) => parseFloat(s.revenue));
+  const ordSpark = data.series.map((s) => s.orders);
+  const periodTotal = STATUS_ORDER.reduce((sum, s) => sum + (data.status_counts[s] ?? 0), 0);
+  const deliveredRate = periodTotal
+    ? Math.round(((data.status_counts.delivered ?? 0) / periodTotal) * 100)
+    : 0;
+  const itemsSold = data.top_products.reduce((sum, p) => sum + p.units, 0);
+
   return (
     <div className="space-y-4">
       {/* Header + period filter */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-3xl uppercase" style={{ fontFamily: "Anton, sans-serif" }}>
-          {t("admin.overview")}
-        </h1>
+        <div>
+          <h1 className="text-3xl uppercase" style={{ fontFamily: "Anton, sans-serif" }}>
+            {t("admin.overview")}
+          </h1>
+          <p className="mt-1 text-sm" style={{ color: VIZ.muted }}>
+            {t("admin.overviewSub", { days })}
+          </p>
+        </div>
         <div className="flex rounded-full border border-white/15 p-1">
           {PERIODS.map((p) => (
             <button
@@ -87,24 +112,61 @@ function AdminOverview() {
           value={formatDACompact(current.revenue)}
           delta={pctDelta(parseFloat(current.revenue), parseFloat(previous.revenue))}
           deltaLabel={vsPrev}
+          icon={<Banknote size={16} />}
+          spark={revSpark}
+          accent={VIZ.blue}
         />
         <StatTile
           label={t("admin.orders")}
           value={String(current.orders)}
           delta={pctDelta(current.orders, previous.orders)}
           deltaLabel={vsPrev}
+          icon={<ShoppingBag size={16} />}
+          spark={ordSpark}
+          accent={VIZ.aqua}
         />
         <StatTile
           label={t("admin.avgOrder")}
           value={formatDACompact(current.aov)}
           delta={pctDelta(parseFloat(current.aov), parseFloat(previous.aov))}
           deltaLabel={vsPrev}
+          icon={<Receipt size={16} />}
         />
         <StatTile
           label={t("admin.newCustomers")}
           value={String(data.totals.new_customers)}
           delta={pctDelta(data.totals.new_customers, data.totals.new_customers_prev)}
           deltaLabel={vsPrev}
+          icon={<UserPlus size={16} />}
+        />
+      </div>
+
+      {/* Secondary metrics strip */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <MiniStat
+          icon={<Clock size={16} />}
+          label={t("admin.openOrders")}
+          value={String(data.totals.open_orders)}
+          hint={t("admin.needsAction")}
+          highlight={data.totals.open_orders > 0}
+        />
+        <MiniStat
+          icon={<CheckCircle2 size={16} />}
+          label={t("admin.deliveredRate")}
+          value={`${deliveredRate}%`}
+          hint={t("admin.thisPeriod")}
+        />
+        <MiniStat
+          icon={<Package size={16} />}
+          label={t("admin.itemsSold")}
+          value={String(itemsSold)}
+          hint={t("admin.thisPeriod")}
+        />
+        <MiniStat
+          icon={<Users size={16} />}
+          label={t("admin.totalCustomers")}
+          value={String(data.totals.customers)}
+          hint={t("admin.allTime")}
         />
       </div>
 
@@ -132,6 +194,21 @@ function AdminOverview() {
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Order pipeline */}
         <Panel title={t("admin.statusBreakdown")}>
+          {/* Status-share bar: one segment per status, 2px surface gaps. */}
+          {periodTotal > 0 && (
+            <div className="mb-4 flex h-2.5 gap-[2px] overflow-hidden rounded-full">
+              {STATUS_ORDER.filter((s) => data.status_counts[s]).map((s) => (
+                <span
+                  key={s}
+                  title={`${t(`order.status.${s}`)}: ${data.status_counts[s]}`}
+                  style={{
+                    width: `${((data.status_counts[s] ?? 0) / periodTotal) * 100}%`,
+                    backgroundColor: STATUS_COLORS[s],
+                  }}
+                />
+              ))}
+            </div>
+          )}
           <BarList
             emptyText={t("admin.noData")}
             items={STATUS_ORDER.filter((s) => data.status_counts[s]).map((s) => ({
@@ -166,13 +243,22 @@ function AdminOverview() {
         </Panel>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
         {/* Low stock */}
         <Panel title={t("admin.lowStock")}>
           {data.low_stock.length === 0 ? (
-            <p className="py-8 text-center text-sm" style={{ color: VIZ.muted }}>
-              {t("admin.stockHealthy")}
-            </p>
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <span
+                className="mb-3 flex h-11 w-11 items-center justify-center rounded-full"
+                style={{ backgroundColor: VIZ.good + "1f", color: VIZ.good }}
+              >
+                <CheckCircle2 size={20} />
+              </span>
+              <p className="text-sm font-medium text-white">{t("admin.stockHealthy")}</p>
+              <p className="mt-1 text-xs" style={{ color: VIZ.muted }}>
+                {t("admin.stockHealthyHint")}
+              </p>
+            </div>
           ) : (
             <ul className="divide-y divide-white/5">
               {data.low_stock.map((v) => (
@@ -205,7 +291,7 @@ function AdminOverview() {
         <Panel
           title={t("admin.recentOrders")}
           action={
-            <Link to="/admin/orders" className="text-xs text-white/50 hover:text-white transition">
+            <Link to="/admin/orders" className="text-xs text-white/50 transition hover:text-white">
               {t("admin.seeAll")} →
             </Link>
           }
@@ -232,6 +318,8 @@ function AdminOverview() {
                         hour: "2-digit",
                         minute: "2-digit",
                       }).format(new Date(o.created_at))}
+                      {" · "}
+                      {t("admin.itemsCount", { count: o.items_count })}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2.5">
@@ -257,6 +345,39 @@ function AdminOverview() {
           )}
         </Panel>
       </div>
+    </div>
+  );
+}
+
+function MiniStat({
+  icon,
+  label,
+  value,
+  hint,
+  highlight,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  hint: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div
+      className="rounded-2xl border px-4 py-3.5"
+      style={{
+        backgroundColor: VIZ.surface,
+        borderColor: highlight ? VIZ.warning + "66" : "rgba(255,255,255,0.1)",
+      }}
+    >
+      <div className="mb-2 flex items-center gap-2" style={{ color: VIZ.muted }}>
+        <span style={{ color: highlight ? VIZ.warning : VIZ.muted }}>{icon}</span>
+        <span className="text-xs">{label}</span>
+      </div>
+      <p className="text-xl font-semibold text-white">{value}</p>
+      <p className="mt-0.5 text-[11px]" style={{ color: VIZ.muted }}>
+        {hint}
+      </p>
     </div>
   );
 }

@@ -26,7 +26,8 @@
     "close": "Close",
     "decrease": "Decrease",
     "increase": "Increase",
-    "added": "Added to cart"
+    "added": "Added to cart",
+    "add": "Add"
   },
   "checkout": {
     "title": "Cash on delivery",
@@ -151,7 +152,19 @@
     "size": "Size",
     "chooseImage": "Choose an image",
     "items": "Items",
-    "orderNumber": "Order"
+    "orderNumber": "Order",
+    "menu": "Menu",
+    "admin": "Admin",
+    "overviewSub": "Performance over the last {{days}} days",
+    "openOrders": "Open orders",
+    "needsAction": "Needs action",
+    "deliveredRate": "Delivery rate",
+    "thisPeriod": "This period",
+    "itemsSold": "Items sold",
+    "totalCustomers": "Customers",
+    "allTime": "All time",
+    "stockHealthyHint": "No restock needed right now.",
+    "itemsCount": "{{count}} item(s)"
   },
   "common": {
     "loading": "Loading...",
@@ -174,7 +187,65 @@
     "storyText": "AV Parfums was born from a simple belief: everyone deserves a trail that feels like their own. Our fragrance mists capture moments — the softness of a sweet dream, the golden warmth of honey — in generous 200 ml formulas.",
     "storyCta": "Discover the brand",
     "ctaTitle": "Ready to find your signature?",
-    "ctaButton": "Explore the shop"
+    "ctaButton": "Explore the shop",
+    "howEyebrow": "Simple & risk-free",
+    "howTitle": "How it works",
+    "how1Title": "Choose",
+    "how1Text": "Browse the collection and add your favourite mists to the cart.",
+    "how2Title": "Order",
+    "how2Text": "Check out in seconds — no account or online payment required.",
+    "how3Title": "Confirmation",
+    "how3Text": "Our team calls you to confirm the order and delivery address.",
+    "how4Title": "Pay on delivery",
+    "how4Text": "Receive your parcel anywhere in Algeria and pay in cash.",
+    "statFragrances": "Fragrances",
+    "statWilayas": "Wilayas served",
+    "statVolume": "Generous size",
+    "statCod": "Cash on delivery",
+    "reviewsEyebrow": "Loved by our customers",
+    "reviewsTitle": "What our customers say",
+    "faqEyebrow": "Good to know",
+    "faqTitle": "Frequently asked questions",
+    "ctaText": "Delivery to all 58 wilayas, cash on delivery. Find the mist that feels like you.",
+    "testimonials": [
+      {
+        "name": "Amina B.",
+        "wilaya": "Algiers",
+        "text": "The scent lasts all day and the bottle is gorgeous. Delivered in 48h, paid on arrival. I recommend it with my eyes closed."
+      },
+      {
+        "name": "Yasmine K.",
+        "wilaya": "Oran",
+        "text": "I got Sweet Dreams and Honey Touch, both smell divine. Great customer service — they called to confirm my order."
+      },
+      {
+        "name": "Lina M.",
+        "wilaya": "Constantine",
+        "text": "Finally quality mists delivered to my door. Cash on delivery, zero stress. I'll order again."
+      }
+    ],
+    "faqs": [
+      {
+        "q": "How does payment work?",
+        "a": "You pay in cash when your parcel arrives (cash on delivery). No online payment is required."
+      },
+      {
+        "q": "Do you deliver across Algeria?",
+        "a": "Yes, we deliver to all 58 wilayas, to your home or a pickup point as you prefer."
+      },
+      {
+        "q": "How long does delivery take?",
+        "a": "Usually 2–5 business days depending on your wilaya. Our team calls to confirm before shipping."
+      },
+      {
+        "q": "What size are the mists?",
+        "a": "All our fragrance mists come in a generous 200 ml size, for daily use that lasts."
+      },
+      {
+        "q": "Can I order without an account?",
+        "a": "Yes. You can check out as a guest — an account just lets you track your orders more easily."
+      }
+    ]
   },
   "footer": {
     "tagline": "Luxury fragrance mists, designed in Algeria to elevate every moment.",

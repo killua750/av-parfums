@@ -27,22 +27,32 @@ export function StatTile({
   value,
   delta,
   deltaLabel,
+  icon,
+  spark,
+  accent = VIZ.blue,
 }: {
   label: string;
   value: string;
   delta?: number | null;
   deltaLabel?: string;
+  icon?: ReactNode;
+  /** Optional mini trend drawn along the tile's base. */
+  spark?: number[];
+  accent?: string;
 }) {
   const up = (delta ?? 0) >= 0;
   return (
     <div
-      className="rounded-2xl border border-white/10 px-5 py-4"
+      className="relative flex flex-col overflow-hidden rounded-2xl border border-white/10 px-5 py-4"
       style={{ backgroundColor: VIZ.surface }}
     >
-      <p className="text-xs mb-1.5" style={{ color: VIZ.secondary }}>
-        {label}
-      </p>
-      <p className="text-[26px] leading-8 font-semibold text-white">{value}</p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs" style={{ color: VIZ.secondary }}>
+          {label}
+        </p>
+        {icon && <span style={{ color: VIZ.muted }}>{icon}</span>}
+      </div>
+      <p className="mt-1.5 text-[26px] font-semibold leading-8 text-white">{value}</p>
       {delta != null && Number.isFinite(delta) && (
         <p className="mt-1.5 flex items-center gap-1 text-xs">
           <span
@@ -56,7 +66,42 @@ export function StatTile({
           {deltaLabel && <span style={{ color: VIZ.muted }}>{deltaLabel}</span>}
         </p>
       )}
+      {spark && spark.length > 1 && <Sparkline values={spark} color={accent} />}
     </div>
+  );
+}
+
+/** Tiny axis-less area trend for stat tiles. */
+function Sparkline({ values, color }: { values: number[]; color: string }) {
+  const w = 100;
+  const h = 28;
+  const max = Math.max(...values, 1);
+  const pts = values.map((v, i) => {
+    const x = (i / (values.length - 1)) * w;
+    const y = h - (v / max) * (h - 3) - 1.5;
+    return [x, y] as const;
+  });
+  const line = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+  const area = `${line} L${w},${h} L0,${h} Z`;
+  return (
+    <svg
+      className="mt-3 w-full"
+      viewBox={`0 0 ${w} ${h}`}
+      height={28}
+      preserveAspectRatio="none"
+      aria-hidden
+    >
+      <path d={area} fill={color} fillOpacity={0.12} />
+      <path
+        d={line}
+        fill="none"
+        stroke={color}
+        strokeWidth={1.5}
+        vectorEffect="non-scaling-stroke"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 
