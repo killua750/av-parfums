@@ -141,6 +141,20 @@ class AdminDashboardView(APIView):
             .order_by("-revenue")[:6]
         ]
 
+        # Revenue by delivery wilaya (period, cancelled excluded) — shows where
+        # demand concentrates geographically.
+        top_wilayas = [
+            {
+                "name": row["shipping_address__wilaya__name"],
+                "orders": row["orders"],
+                "revenue": str((row["revenue"] or Decimal("0")).quantize(cents)),
+            }
+            for row in current.filter(shipping_address__isnull=False)
+            .values("shipping_address__wilaya__name")
+            .annotate(orders=Count("id"), revenue=Sum("total"))
+            .order_by("-revenue")[:6]
+        ]
+
         low_stock = [
             {
                 "product": v.product.name,
@@ -187,6 +201,7 @@ class AdminDashboardView(APIView):
                 "series": series,
                 "status_counts": status_counts,
                 "top_products": top_products,
+                "top_wilayas": top_wilayas,
                 "low_stock": low_stock,
                 "recent_orders": recent_orders,
             }

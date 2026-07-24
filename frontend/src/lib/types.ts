@@ -67,6 +67,7 @@ export interface DashboardData {
   series: { date: string; revenue: string; orders: number }[];
   status_counts: Partial<Record<OrderStatus, number>>;
   top_products: { name: string; units: number; revenue: string }[];
+  top_wilayas: { name: string; orders: number; revenue: string }[];
   low_stock: { product: string; size: string; sku: string; stock: number }[];
   recent_orders: {
     number: string;

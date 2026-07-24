@@ -243,6 +243,20 @@ function AdminOverview() {
         </Panel>
       </div>
 
+      {/* Sales by wilaya */}
+      <Panel title={t("admin.topWilayas")}>
+        <BarList
+          color={VIZ.blue}
+          emptyText={t("admin.noData")}
+          items={data.top_wilayas.map((w) => ({
+            key: w.name,
+            label: `${w.name} · ${t("admin.ordersCount", { count: w.orders })}`,
+            value: parseFloat(w.revenue),
+            display: formatDACompact(w.revenue),
+          }))}
+        />
+      </Panel>
+
       <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
         {/* Low stock */}
         <Panel title={t("admin.lowStock")}>

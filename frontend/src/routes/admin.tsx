@@ -3,7 +3,16 @@
 // /api/v1/admin/* endpoint re-checks IsAdmin server-side.
 import { useState } from "react";
 import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
-import { ArrowUpRight, LayoutDashboard, LogOut, Menu, Package, ShoppingBag, X } from "lucide-react";
+import {
+  ArrowUpRight,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Package,
+  Settings,
+  ShoppingBag,
+  X,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useLogout } from "@/hooks/useAuth";
@@ -35,6 +44,7 @@ const NAV = [
   { to: "/admin", icon: LayoutDashboard, labelKey: "admin.overview", exact: true },
   { to: "/admin/products", icon: Package, labelKey: "admin.products", exact: false },
   { to: "/admin/orders", icon: ShoppingBag, labelKey: "admin.orders", exact: false },
+  { to: "/admin/settings", icon: Settings, labelKey: "admin.settings", exact: false },
 ] as const;
 
 function AdminLayout() {
