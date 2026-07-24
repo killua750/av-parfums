@@ -48,7 +48,10 @@
       "wilaya": "Pick a wilaya.",
       "commune": "Commune is required.",
       "address": "Address is too short."
-    }
+    },
+    "promoPlaceholder": "Promo code",
+    "apply": "OK",
+    "discount": "Discount"
   },
   "shop": {
     "title": "Shop",
@@ -216,7 +219,7 @@
     "contactPhone": "Contact phone",
     "contactEmail": "Contact e-mail",
     "instagram": "Instagram",
-    "freeShipping": "Free-shipping threshold (DA)",
+    "freeShipping": "Free shipping",
     "margin": "Margin",
     "sales": "Sales",
     "views": "Views",
@@ -239,7 +242,24 @@
     "ordersCountCol": "Orders",
     "totalSpent": "Total spent",
     "lastOrder": "Last order",
-    "orderHistory": "Order history"
+    "orderHistory": "Order history",
+    "promos": "Promo codes",
+    "newPromo": "New code",
+    "code": "Code",
+    "discount": "Discount",
+    "usage": "Uses",
+    "min": "min.",
+    "inactive": "Inactive",
+    "discountType": "Discount type",
+    "kindPercent": "Percentage",
+    "kindFixed": "Fixed amount",
+    "percentValue": "Value (%)",
+    "fixedValue": "Amount (DA)",
+    "minOrder": "Min. order",
+    "expiry": "Expiry",
+    "usageLimit": "Global limit",
+    "perCustomer": "Per customer",
+    "activeCode": "Active code"
   },
   "common": {
     "loading": "Loading...",

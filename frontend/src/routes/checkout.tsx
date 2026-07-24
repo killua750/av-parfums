@@ -38,6 +38,35 @@ function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const { data: wilayas = [] } = useWilayas();
   const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
+  const [promoInput, setPromoInput] = useState("");
+  const [promo, setPromo] = useState<{ code: string; discount: number } | null>(null);
+  const [promoMsg, setPromoMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [checkingPromo, setCheckingPromo] = useState(false);
+
+  const total = Math.max(subtotal - (promo?.discount ?? 0), 0);
+
+  const applyPromo = async () => {
+    const code = promoInput.trim();
+    if (!code) return;
+    setCheckingPromo(true);
+    try {
+      const res = await api<{ valid: boolean; discount?: string; message: string }>(
+        "/api/v1/promo/validate/",
+        { method: "POST", body: { code, subtotal: String(subtotal) } },
+      );
+      if (res.valid) {
+        setPromo({ code, discount: parseFloat(res.discount ?? "0") });
+        setPromoMsg({ ok: true, text: res.message });
+      } else {
+        setPromo(null);
+        setPromoMsg({ ok: false, text: res.message });
+      }
+    } catch {
+      setPromoMsg({ ok: false, text: t("common.error") });
+    } finally {
+      setCheckingPromo(false);
+    }
+  };
 
   const {
     register,
@@ -55,6 +84,7 @@ function CheckoutPage() {
         body: {
           items: items.map((i) => ({ variant_id: i.variantId, quantity: i.quantity })),
           shipping_address: form,
+          promo_code: promo?.code ?? "",
         },
       });
       clear();
@@ -122,9 +152,46 @@ function CheckoutPage() {
                   </span>
                 </li>
               ))}
-              <li className="py-3 flex justify-between font-bold">
-                <span>{t("order.total")}</span>
+              <li className="py-3 flex justify-between text-sm">
+                <span className="text-white/60">{t("cart.subtotal")}</span>
                 <span>{formatDA(subtotal)}</span>
+              </li>
+              <li className="pb-3">
+                <div className="flex gap-2">
+                  <input
+                    value={promoInput}
+                    onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                    placeholder={t("checkout.promoPlaceholder")}
+                    className={`${inputCls} py-2.5 font-mono tracking-wider`}
+                  />
+                  <button
+                    type="button"
+                    onClick={applyPromo}
+                    disabled={checkingPromo || !promoInput.trim()}
+                    className="shrink-0 rounded-lg border border-white/25 px-4 text-xs font-semibold uppercase tracking-widest transition hover:bg-white hover:text-black disabled:opacity-40"
+                  >
+                    {t("checkout.apply")}
+                  </button>
+                </div>
+                {promoMsg && (
+                  <p
+                    className={`mt-1.5 text-xs ${promoMsg.ok ? "text-green-400" : "text-red-400"}`}
+                  >
+                    {promoMsg.text}
+                  </p>
+                )}
+              </li>
+              {promo && promo.discount > 0 && (
+                <li className="flex justify-between py-2 text-sm text-green-400">
+                  <span>
+                    {t("checkout.discount")} · {promo.code}
+                  </span>
+                  <span>−{formatDA(promo.discount)}</span>
+                </li>
+              )}
+              <li className="flex justify-between border-t border-white/10 py-3 font-bold">
+                <span>{t("order.total")}</span>
+                <span>{formatDA(total)}</span>
               </li>
             </ul>
 

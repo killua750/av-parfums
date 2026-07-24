@@ -6,12 +6,15 @@ from apps.orders.views import (
     AdminCustomersView,
     AdminDashboardView,
     AdminOrderViewSet,
+    AdminPromoViewSet,
     OrderViewSet,
+    PromoValidateView,
 )
 
 router = DefaultRouter()
 router.register("orders", OrderViewSet, basename="order")
 router.register("admin/orders", AdminOrderViewSet, basename="admin-order")
+router.register("admin/promos", AdminPromoViewSet, basename="admin-promo")
 
 urlpatterns = [
     path("admin/dashboard/", AdminDashboardView.as_view(), name="admin-dashboard"),
@@ -21,5 +24,6 @@ urlpatterns = [
         AdminCustomerOrdersView.as_view(),
         name="admin-customer-orders",
     ),
+    path("promo/validate/", PromoValidateView.as_view(), name="promo-validate"),
     *router.urls,
 ]

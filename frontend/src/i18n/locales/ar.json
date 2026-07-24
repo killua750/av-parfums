@@ -48,7 +48,10 @@
       "wilaya": "اختر ولاية.",
       "commune": "البلدية مطلوبة.",
       "address": "العنوان قصير جداً."
-    }
+    },
+    "promoPlaceholder": "كود الخصم",
+    "apply": "تطبيق",
+    "discount": "الخصم"
   },
   "shop": {
     "title": "المتجر",
@@ -216,7 +219,7 @@
     "contactPhone": "هاتف التواصل",
     "contactEmail": "البريد الإلكتروني",
     "instagram": "إنستغرام",
-    "freeShipping": "حد الشحن المجاني (دج)",
+    "freeShipping": "توصيل مجاني",
     "margin": "الهامش",
     "sales": "المبيعات",
     "views": "المشاهدات",
@@ -239,7 +242,24 @@
     "ordersCountCol": "الطلبات",
     "totalSpent": "إجمالي الإنفاق",
     "lastOrder": "آخر طلب",
-    "orderHistory": "سجل الطلبات"
+    "orderHistory": "سجل الطلبات",
+    "promos": "أكواد الخصم",
+    "newPromo": "كود جديد",
+    "code": "الكود",
+    "discount": "الخصم",
+    "usage": "الاستخدامات",
+    "min": "حد أدنى",
+    "inactive": "غير مفعّل",
+    "discountType": "نوع الخصم",
+    "kindPercent": "نسبة مئوية",
+    "kindFixed": "مبلغ ثابت",
+    "percentValue": "القيمة (%)",
+    "fixedValue": "المبلغ (دج)",
+    "minOrder": "أدنى طلب",
+    "expiry": "انتهاء الصلاحية",
+    "usageLimit": "الحد الإجمالي",
+    "perCustomer": "لكل عميل",
+    "activeCode": "كود مفعّل"
   },
   "common": {
     "loading": "جارٍ التحميل...",

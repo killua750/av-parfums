@@ -225,3 +225,38 @@ class TestAdminCustomers:
         # order history endpoint returns both
         hist = admin_client.get(reverse("admin-customer-orders"), {"phone": c["phone"]})
         assert len(hist.data) == 2
+
+
+class TestPromoCodes:
+    def test_percentage_discount_applied(self, api_client, variant, wilaya):
+        from apps.orders.models import PromoCode
+
+        PromoCode.objects.create(code="SAVE10", kind="percent", value=10)
+        payload = order_payload(variant, wilaya, qty=2)  # 2 × 2500 = 5000
+        payload["promo_code"] = "SAVE10"
+        resp = api_client.post(ORDERS_URL, payload, format="json")
+        assert resp.status_code == 201, resp.data
+        assert resp.data["discount"] == "500.00"
+        assert resp.data["total"] == "4500.00"
+
+    def test_min_order_enforced(self, api_client, variant, wilaya):
+        from apps.orders.models import PromoCode
+
+        PromoCode.objects.create(code="BIG", kind="fixed", value=1000, min_order=9999)
+        payload = order_payload(variant, wilaya, qty=1)
+        payload["promo_code"] = "BIG"
+        resp = api_client.post(ORDERS_URL, payload, format="json")
+        assert resp.data["discount"] == "0.00"  # min not met → no discount
+
+    def test_validate_endpoint(self, api_client):
+        from apps.orders.models import PromoCode
+
+        PromoCode.objects.create(code="HELLO", kind="percent", value=20)
+        ok = api_client.post(reverse("promo-validate"), {"code": "HELLO", "subtotal": "5000"})
+        assert ok.data["valid"] is True and ok.data["discount"] == "1000.00"
+        bad = api_client.post(reverse("promo-validate"), {"code": "NOPE", "subtotal": "5000"})
+        assert bad.data["valid"] is False
+
+    def test_admin_crud_requires_admin(self, api_client, admin_client):
+        assert api_client.get(reverse("admin-promo-list")).status_code in (401, 403)
+        assert admin_client.get(reverse("admin-promo-list")).status_code == 200

@@ -48,7 +48,10 @@
       "wilaya": "Choisissez une wilaya.",
       "commune": "Commune requise.",
       "address": "Adresse trop courte."
-    }
+    },
+    "promoPlaceholder": "Code promo",
+    "apply": "OK",
+    "discount": "Réduction"
   },
   "shop": {
     "title": "Boutique",
@@ -216,7 +219,7 @@
     "contactPhone": "Téléphone de contact",
     "contactEmail": "E-mail de contact",
     "instagram": "Instagram",
-    "freeShipping": "Seuil livraison gratuite (DA)",
+    "freeShipping": "Livraison gratuite",
     "margin": "Marge",
     "sales": "Ventes",
     "views": "Vues",
@@ -239,7 +242,24 @@
     "ordersCountCol": "Commandes",
     "totalSpent": "Total dépensé",
     "lastOrder": "Dernière commande",
-    "orderHistory": "Historique des commandes"
+    "orderHistory": "Historique des commandes",
+    "promos": "Codes promo",
+    "newPromo": "Nouveau code",
+    "code": "Code",
+    "discount": "Réduction",
+    "usage": "Utilisations",
+    "min": "min.",
+    "inactive": "Inactif",
+    "discountType": "Type de réduction",
+    "kindPercent": "Pourcentage",
+    "kindFixed": "Montant fixe",
+    "percentValue": "Valeur (%)",
+    "fixedValue": "Montant (DA)",
+    "minOrder": "Commande min.",
+    "expiry": "Expiration",
+    "usageLimit": "Limite globale",
+    "perCustomer": "Par client",
+    "activeCode": "Code actif"
   },
   "common": {
     "loading": "Chargement...",

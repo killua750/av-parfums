@@ -7,7 +7,7 @@ from rest_framework import serializers
 from apps.accounts.models import algerian_phone_validator
 from apps.catalog.models import ProductVariant
 from apps.core.models import Wilaya
-from apps.orders.models import Order, OrderItem, OrderStatus, ShippingAddress
+from apps.orders.models import Order, OrderItem, OrderStatus, PromoCode, ShippingAddress
 from apps.payments.models import Payment
 
 
@@ -49,6 +49,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "status",
             "subtotal",
             "shipping_fee",
+            "discount",
             "total",
             "cancel_reason",
             "items",
@@ -68,6 +69,7 @@ class OrderCreateSerializer(serializers.Serializer):
 
     items = OrderItemInputSerializer(many=True, allow_empty=False)
     shipping_address = ShippingAddressSerializer()
+    promo_code = serializers.CharField(required=False, allow_blank=True)
 
     def validate_items(self, items):
         seen: set[int] = set()
@@ -127,8 +129,32 @@ class OrderCreateSerializer(serializers.Serializer):
 
         order.subtotal = subtotal
         order.shipping_fee = Decimal("0")  # COD: shipping billed at delivery
-        order.total = subtotal + order.shipping_fee
-        order.save(update_fields=["subtotal", "shipping_fee", "total"])
+
+        # Apply a promo code if one was supplied and passes validation.
+        discount = Decimal("0")
+        code = (validated_data.get("promo_code") or "").strip().upper()
+        if code:
+            from django.db.models import F
+
+            from apps.orders.models import PromoCode, PromoRedemption
+
+            promo = PromoCode.objects.filter(code=code).first()
+            if promo:
+                amount, error = promo.discount_for(subtotal, address_data.get("phone", ""))
+                if error is None:
+                    discount = amount
+                    order.promo = promo
+                    PromoRedemption.objects.create(
+                        promo=promo,
+                        order=order,
+                        phone=address_data.get("phone", ""),
+                        discount=discount,
+                    )
+                    PromoCode.objects.filter(pk=promo.pk).update(used_count=F("used_count") + 1)
+
+        order.discount = discount
+        order.total = subtotal - discount + order.shipping_fee
+        order.save(update_fields=["subtotal", "shipping_fee", "discount", "total", "promo"])
 
         Payment.objects.create(order=order, method=Payment.Method.COD, amount=order.total)
 
@@ -160,3 +186,33 @@ class OrderStatusUpdateSerializer(serializers.Serializer):
                 {"cancel_reason": "Le motif d'annulation est obligatoire."}
             )
         return attrs
+
+
+class PromoCodeSerializer(serializers.ModelSerializer):
+    """Admin CRUD for discount codes + live usage/revenue attribution."""
+
+    revenue = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PromoCode
+        fields = [
+            "id",
+            "code",
+            "kind",
+            "value",
+            "min_order",
+            "expires_at",
+            "usage_limit",
+            "per_customer_limit",
+            "is_active",
+            "used_count",
+            "revenue",
+            "created_at",
+        ]
+        read_only_fields = ["used_count", "created_at"]
+
+    def get_revenue(self, obj: PromoCode) -> str:
+        from django.db.models import Sum
+
+        total = obj.orders.exclude(status=OrderStatus.CANCELLED).aggregate(r=Sum("total"))["r"]
+        return str(total or Decimal("0"))

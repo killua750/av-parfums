@@ -10,6 +10,7 @@ import {
   Menu,
   Package,
   Settings,
+  Ticket,
   ShoppingBag,
   Users,
   X,
@@ -46,6 +47,7 @@ const NAV = [
   { to: "/admin/orders", icon: ShoppingBag, labelKey: "admin.orders", exact: false },
   { to: "/admin/products", icon: Package, labelKey: "admin.products", exact: false },
   { to: "/admin/customers", icon: Users, labelKey: "admin.customers", exact: false },
+  { to: "/admin/promos", icon: Ticket, labelKey: "admin.promos", exact: false },
   { to: "/admin/settings", icon: Settings, labelKey: "admin.settings", exact: false },
 ] as const;
 

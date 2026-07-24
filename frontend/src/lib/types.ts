@@ -76,6 +76,23 @@ export interface CustomersResponse {
   customers: Customer[];
 }
 
+export type PromoKind = "percent" | "fixed" | "free_shipping";
+
+export interface PromoCode {
+  id: number;
+  code: string;
+  kind: PromoKind;
+  value: string;
+  min_order: string;
+  expires_at: string | null;
+  usage_limit: number | null;
+  per_customer_limit: number;
+  is_active: boolean;
+  used_count: number;
+  revenue: string;
+  created_at: string;
+}
+
 export type StockReason = "restock" | "correction" | "damage" | "return";
 
 export interface StockMovement {

@@ -21,11 +21,12 @@ from rest_framework.views import APIView
 
 from apps.catalog.models import ProductVariant
 from apps.core.permissions import IsAdmin, IsOwnerOrAdmin
-from apps.orders.models import Order, OrderItem, OrderStatus
+from apps.orders.models import Order, OrderItem, OrderStatus, PromoCode
 from apps.orders.serializers import (
     OrderCreateSerializer,
     OrderSerializer,
     OrderStatusUpdateSerializer,
+    PromoCodeSerializer,
 )
 
 
@@ -432,3 +433,40 @@ class AdminCustomerOrdersView(APIView):
             .order_by("-created_at")
         )
         return Response(OrderSerializer(orders, many=True).data)
+
+
+class PromoValidateView(APIView):
+    """Public: validate a code against a cart subtotal (used at checkout)."""
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        code = (request.data.get("code") or "").strip().upper()
+        try:
+            subtotal = Decimal(str(request.data.get("subtotal", "0")))
+        except (TypeError, ValueError):
+            subtotal = Decimal("0")
+        promo = PromoCode.objects.filter(code=code).first()
+        if not promo:
+            return Response({"valid": False, "message": "Code invalide."})
+        discount, error = promo.discount_for(subtotal, request.data.get("phone", ""))
+        if error:
+            return Response({"valid": False, "message": error})
+        return Response(
+            {
+                "valid": True,
+                "code": promo.code,
+                "kind": promo.kind,
+                "discount": str(discount),
+                "message": "Code appliqué.",
+            }
+        )
+
+
+class AdminPromoViewSet(viewsets.ModelViewSet):
+    """Full CRUD for discount codes — IsAdmin enforced."""
+
+    permission_classes = [IsAdmin]
+    queryset = PromoCode.objects.all()
+    serializer_class = PromoCodeSerializer
+    pagination_class = None
