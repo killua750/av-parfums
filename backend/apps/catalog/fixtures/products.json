@@ -70,5 +70,67 @@
       "created_at": "2026-07-07T12:00:00Z",
       "updated_at": "2026-07-07T12:00:00Z"
     }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 3,
+    "fields": {
+      "category": 1,
+      "name": "Dziria",
+      "slug": "dziria",
+      "tagline": "Néroli · Fleur d'oranger · Ambre",
+      "description": "Une brume solaire inspirée d'Alger — néroli, fleur d'oranger et ambre doré, comme un coucher de soleil sur la Casbah.",
+      "tint": "#C9873E",
+      "bottle_image": "products/bottles/dziria-bottle.png",
+      "background_image": "products/backgrounds/dziria-bg.jpg",
+      "is_active": true,
+      "featured": true,
+      "created_at": "2026-07-19T12:00:00Z",
+      "updated_at": "2026-07-19T12:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productvariant",
+    "pk": 3,
+    "fields": {
+      "product": 3,
+      "sku": "AV-DZ-200",
+      "size": "Brume 200ml",
+      "price": "2800.00",
+      "stock": 50,
+      "created_at": "2026-07-19T12:00:00Z",
+      "updated_at": "2026-07-19T12:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 4,
+    "fields": {
+      "category": 1,
+      "name": "Afro Passion",
+      "slug": "afro-passion",
+      "tagline": "Ananas · Coco · Fruits exotiques",
+      "description": "Une brume tropicale évasion — ananas juteux, noix de coco et fruits exotiques sur un coucher de soleil doré.",
+      "tint": "#2FA69A",
+      "bottle_image": "products/bottles/afro-passion-bottle.png",
+      "background_image": "products/backgrounds/afro-passion-bg.jpg",
+      "is_active": true,
+      "featured": true,
+      "created_at": "2026-07-20T12:00:00Z",
+      "updated_at": "2026-07-20T12:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productvariant",
+    "pk": 4,
+    "fields": {
+      "product": 4,
+      "sku": "AV-AP-200",
+      "size": "Brume 200ml",
+      "price": "2800.00",
+      "stock": 50,
+      "created_at": "2026-07-20T12:00:00Z",
+      "updated_at": "2026-07-20T12:00:00Z"
+    }
   }
 ]

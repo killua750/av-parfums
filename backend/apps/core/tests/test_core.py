@@ -25,7 +25,7 @@ def test_products_fixture_seeds_catalog(api_client):
     call_command("loaddata", "products", verbosity=0)
     resp = api_client.get(reverse("product-list"))
     slugs = {p["slug"] for p in resp.data["results"]}
-    assert slugs == {"sweet-dreams", "honey-touch"}
+    assert slugs == {"sweet-dreams", "honey-touch", "dziria", "afro-passion"}
     detail = api_client.get(reverse("product-detail", kwargs={"slug": "sweet-dreams"}))
     assert detail.data["variants"][0]["price"] == "2500.00"
 

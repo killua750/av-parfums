@@ -37,3 +37,8 @@ Thumbs.db
 # --- Lovable workspace remnant ---
 .workspace/
 .lovable/
+
+# Lovable raw export (reference only, not part of the deployed app)
+/takiv2/
+# Local Claude settings
+.claude/settings.json
